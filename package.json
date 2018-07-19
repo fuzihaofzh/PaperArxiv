@@ -1,0 +1,46 @@
+{
+    "name": "PaperArxiv",
+    "version": "0.0.1",
+    "description": "A paper management tool",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "test": "ava",
+        "buildlinux": "electron-packager .  PaperArxiv --platform=linux --arch=x64 --out dist/ --asar --overwrite",
+        "buildwin": "electron-packager .  PaperArxiv --platform=win32 --arch=x64 --out dist/ --icon=icons/pa.ico --prune=true --asar --overwrite ",
+        "buildmac": "electron-packager .  PaperArxiv --platform=darwin --arch=x64 --out dist/ --icon=icons/pa.ico --asar --overwrite ",
+        "deb64": "electron-installer-debian --src dist/PaperArxiv-linux-x64 --dest dist/installers/ --icon icons/pa.icns --arch amd64",
+        "win64": "node buildwin64.js"
+    },
+    "postinstall": "./node_modules/.bin/electron-rebuild",
+    "repository": "https://github.com/electron/electron-quick-start",
+    "keywords": [
+        "Electron",
+        "quick",
+        "start",
+        "tutorial",
+        "demo"
+    ],
+    "author": "Maple",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "~1.7.9",
+        "electron-rebuild": "^1.6.0",
+        "electron-packager": "9.0.0",
+        "electron-installer-debian": "0.5.2",
+        "vue-devtools": "3.1.6",
+        "electron-builder": "^19.27.2",
+        "electron-winstaller": "2.6.3",
+        "ava": "0.22.0"
+    },
+    "dependencies": {
+        "better-sqlite3": "3.3.0",
+        "child_process": "1.0.2",
+        "element-ui": "1.4.12",
+        "home-dir": "1.0.0",
+        "path": "0.12.7",
+        "vue": "2.5.2",
+        "xmldom": "0.1.27",
+        "xpath": "0.0.24"
+    }
+}

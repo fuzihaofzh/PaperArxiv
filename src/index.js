@@ -32,12 +32,13 @@ var ItemEdit = {
             itemEditFormVisible: false,
             itemConfigFormVisible: false,
             tableData: utils.partialCopyArray(ctx.tableData, ctx.showKeys),
-            userInputSearchText: ""
+            userInputSearchText: "",
         }
     },
     methods: {
         openPdfFile: function() {
             fileManager.loadFile(this.ctx);
+            this.$refs.searchBox.focus();
         },
         itemEditFormDataUpdate: function() {
             this.itemEditFormVisible = false;
@@ -48,6 +49,10 @@ var ItemEdit = {
                 ctx.dbManager.InsertItemInfo();
             }
             this.searchContent();
+            this.$refs.searchBox.focus();
+        },
+        itemEditFormDataCancel: function(){
+            this.$refs.searchBox.focus();
         },
         itemConfigFormDataUpdate: function(){
             var config = utils.stringToConfig(this.itemConfigFormData, ctx);
@@ -57,6 +62,7 @@ var ItemEdit = {
             this.itemConfigFormVisible = false;
             this.itemConfigFormData = utils.configToString(ctx.configSettings);
             location.reload(true);
+            this.$refs.searchBox.focus();
         },
         changNameByNewInfo: function() {
             this.itemEditFormData.name = ([this.itemEditFormData.year, this.itemEditFormData.journal, this.itemEditFormData.authors.split('\n')[0]].join('-') + ".pdf").replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');
@@ -64,7 +70,7 @@ var ItemEdit = {
         openPdfFileWithSystemTool: function(val){
             shell.openItem(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
         },
-        searchContent: function(){
+        searchContent: function(value){
             if(this.userInputSearchText.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
             }else{
@@ -78,13 +84,19 @@ var ItemEdit = {
             if(findItem.length !== 1){ctx.error('数据库中找不到该文件，请重启程序！');return;};
             ctx.ctor.itemEditFormData = utils.deepcopy(findItem[0]);
         },
-        deleteRowInfo: function(row){
-          this.$confirm('确认删除记录' + row.name.replace(/<\/?[^>]+(>|$)/g, "") + '？')
+        deleteRowInfo: function(){
+            name = ctx.ctor.itemEditFormData.name;
+            this.itemEditFormVisible = false;
+            this.$confirm('Confirm to delete record ' + name.replace(/<\/?[^>]+(>|$)/g, "") + '？')
                 .then(_ => {
-                  ctx.dbManager.deleteItemInfo(row.name.replace(/<\/?[^>]+(>|$)/g, ""));
+                  ctx.dbManager.deleteItemInfo(name.replace(/<\/?[^>]+(>|$)/g, ""));
                   this.searchContent();
+                  this.$refs.searchBox.focus();
                 })
                 .catch(_ => {})
+        },
+        onCellDBClick: function(row, column, cell, event){
+            this.editRowInfo(row);
         }
     }
 }
@@ -100,7 +112,9 @@ function updateWindowSize(){
     var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     document.getElementById('el-main-table').setAttribute("style","height:" + (height - 60).toString() + "px");
 }
-updateWindowSize();
+
 window.addEventListener('resize', function (e){
       updateWindowSize();
     }, true);
+
+updateWindowSize();

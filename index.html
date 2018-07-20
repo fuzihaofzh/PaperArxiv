@@ -6,24 +6,24 @@
     <meta charset="UTF-8">
     </meta>
     <title>Paper Arxiv</title>
-    <link rel="stylesheet" href="node_modules/element-ui/lib/theme-default/index.css">
+    <link rel="stylesheet" href="node_modules/element-ui/lib/theme-chalk/index.css">
 </head>
 
 <body style="overflow-y:hidden">
     <div id="app">
-        <div style="float:right; width:180px;margin-bottom: 8px;">
-            <el-button icon="plus" @click="openPdfFile">添加</el-button>
-            <el-button icon="setting" @click="itemConfigFormVisible = true">配置</el-button>
+        <div style="float:right; width:210px; margin-bottom: 8px;">
+            <el-button icon="el-icon-plus" @click="openPdfFile">Add</el-button>
+            <el-button icon="el-icon-setting" @click="itemConfigFormVisible = true">Config</el-button>
         </div>
-        <div style="margin-right: 200px;margin-bottom: 8px;">
-            <el-input placeholder="请输入查找内容（支持正则表达式）" v-model="userInputSearchText" autofocus @change="searchContent">
-                <el-button slot="append" icon="search" @click="searchContent"></el-button>
+        <div style="margin-right: 220px;margin-bottom: 8px;">
+            <el-input placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus v-on:input="searchContent" style="width:100%" ref="searchBox">
+                <el-button slot="append" icon="el-icon-search" @click="searchContent"></el-button>
             </el-input>
         </div>
 
 
 
-      <el-dialog title="配置" :visible.sync="itemConfigFormVisible" :show-close=false size="large">
+      <el-dialog title="配置" :visible.sync="itemConfigFormVisible" :show-close=false width="80%">
           <el-form :model="itemConfigFormData">
               <el-form-item label="路径">
                   <el-input v-model="itemConfigFormData.libpath" type="textarea" autosize auto-complete="off" ></el-input>
@@ -34,76 +34,78 @@
 
           </el-form>
           <div slot="footer" class="dialog-footer">
-              <el-button @click="itemConfigFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="itemConfigFormDataUpdate" autofocus>确 定</el-button>
+              <el-button @click="itemConfigFormVisible = false">Cancel</el-button>
+              <el-button type="primary" @click="itemConfigFormDataUpdate" autofocus>OK</el-button>
           </div>
       </el-dialog>
 
-        <el-dialog title="编辑条目" :visible.sync="itemEditFormVisible" :show-close=false size="large">
+        <el-dialog title="Edit Item" :visible.sync="itemEditFormVisible" :show-close=false width="80%">
             <el-form :model="itemEditFormData">
-                <el-form-item label="名称">
+                <el-form-item label="Name">
                     <el-input v-model="itemEditFormData.name" type="textarea" autosize auto-complete="off" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="标题">
+                <el-form-item label="Title">
                     <el-input v-model="itemEditFormData.title" type="textarea" autosize auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="期刊">
+                <el-form-item label="Journal">
                     <el-input v-model="itemEditFormData.journal" type="textarea" autosize auto-complete="off" @change="changNameByNewInfo"></el-input>
                 </el-form-item>
-                <el-form-item label="作者">
+                <el-form-item label="Authors">
                     <el-input v-model="itemEditFormData.authors" type="textarea" autosize auto-complete="off" @change="changNameByNewInfo"></el-input>
                 </el-form-item>
-                <el-form-item label="年份">
+                <el-form-item label="Year">
                     <el-input v-model="itemEditFormData.year" type="textarea" autosize auto-complete="off" @change="changNameByNewInfo"></el-input>
                 </el-form-item>
                 <el-form-item label="tags">
                     <el-input v-model="itemEditFormData.tags" type="textarea" autosize auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="笔记">
+                <el-form-item label="Notes">
                     <el-input v-model="itemEditFormData.comment" type="textarea" autosize auto-complete="off"></el-input>
                 </el-form-item>
 
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="itemEditFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="itemEditFormDataUpdate" autofocus>确 定</el-button>
+                <el-button type="danger" @click="deleteRowInfo()">Delete</el-button>
+                <el-button @click="itemEditFormVisible = false;itemEditFormDataCancel();">Cancel</el-button>
+                <el-button type="primary" @click="itemEditFormDataUpdate" autofocus>OK</el-button>
             </div>
         </el-dialog>
 
-        <el-table id="el-main-table" :data="tableData"  border height="100%" style="height:400px; width: 100%" :default-sort="{prop: 'updateTime', order: 'descending'}">
-            <el-table-column type="expand">
-                <template scope="table">
-                <el-button size="small" @click="editRowInfo(table.row)">编辑</el-button>
-                <el-button size="small" type="danger" @click="deleteRowInfo(table.row)">删除</el-button>
+        <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'updateTime', order: 'descending'}" @cell-dblclick="onCellDBClick">
+            <!--<el-table-column type="expand">
+                <template slot-scope="table">
+                <el-button size="small" @click="editRowInfo(table.row)">Edit</el-button>
+                <el-button size="small" type="danger" @click="deleteRowInfo(table.row)">Delete</el-button>
               </template>
-            </el-table-column>
-            <el-table-column prop="name" label="名称" sortable>
-                <template scope="table">
+            </el-table-column>-->
+            <el-table-column prop="name" label="Name" sortable>
+                <template slot-scope="table">
                 <p v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer"></p>
                 </template>
             </el-table-column>
-            <el-table-column prop="title" label="标题" sortable>
-                <template scope="table">
+            <el-table-column prop="title" label="Title" sortable>
+                <template slot-scope="table">
               <p v-html="table.row.title"></p>
             </template>
             </el-table-column>
-            <el-table-column prop="authors" label="作者"  sortable>
-                <template scope="table">
+            <el-table-column prop="authors" label="Authors"  sortable>
+                <template slot-scope="table">
               <p v-html="table.row.authors" style="white-space: pre-line"></p>
+              <!--<el-input type="textarea" autosize v-model="table.row.authors" > </el-input>-->
             </template>
             </el-table-column>
             <el-table-column prop="tags" label="tags" sortable>
-                <template scope="table">
+                <template slot-scope="table">
               <p v-html="table.row.tags"></p>
             </template>
             </el-table-column>
-            <el-table-column prop="comment" label="笔记" > <!--show-overflow-tooltip-->
-                <template scope="table">
+            <el-table-column prop="comment" label="Notes" > <!--show-overflow-tooltip-->
+                <template slot-scope="table">
               <p v-html="table.row.comment"></p>
             </template>
             </el-table-column>
-            <el-table-column prop="updateTime" label="更新时间" sortable>
-                <template scope="table">
+            <el-table-column prop="updateTime" label="Update Time" sortable>
+                <template slot-scope="table">
               <p v-html="table.row.updateTime"></p>
             </template>
             </el-table-column>

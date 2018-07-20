@@ -46,7 +46,7 @@ function extractFromPdfFile(filePath, ctx) {
     pdfInfo.name = ([pdfInfo.year, pdfInfo.journal, authors[0].replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" \n]/g, '')].join('-') + '.pdf').replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');
     pdfInfo.authors = authors.map(x => x.trim()).join('\n')
     var d = new Date()
-    pdfInfo.addTime = d.toISOString().slice(0, 10) + ' ' + d.toTimeString().slice(0, 8);
+    pdfInfo.addTime = d.toLocaleDateString().replace(/\//g,'-').slice(0, 10) + ' ' + d.toTimeString().slice(0, 8);
     pdfInfo.updateTime = pdfInfo.addTime;
     pdfInfo.content = child_process.execSync('pdftohtml -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');
     pdfInfo.tags = "";

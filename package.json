@@ -1,6 +1,6 @@
 {
     "name": "PaperArxiv",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "A paper management tool",
     "main": "main.js",
     "scripts": {
@@ -24,7 +24,7 @@
     "author": "Maple",
     "license": "MIT",
     "devDependencies": {
-        "electron": "~1.7.9",
+        "electron": "~1.8.7",
         "electron-rebuild": "^1.6.0",
         "electron-packager": "9.0.0",
         "electron-installer-debian": "0.5.2",
@@ -34,9 +34,9 @@
         "ava": "0.22.0"
     },
     "dependencies": {
-        "better-sqlite3": "3.3.0",
+        "better-sqlite3": "4.1.2",
         "child_process": "1.0.2",
-        "element-ui": "1.4.12",
+        "element-ui": "2.0.11",
         "home-dir": "1.0.0",
         "path": "0.12.7",
         "vue": "2.5.2",

@@ -21,8 +21,20 @@ function DBManager(ctx) {
         };
     };
 
+    _exteactTags = function(tableData, key){
+        var tags = tableData.map(x => x[key].split(","));
+        tags = Array.prototype.concat.apply([], tags);
+        tags = tags.map(x => x.trim()).filter(x => x.length > 0);
+        var counts = {};
+        for (var i = 0; i < tags.length; i++) {
+          counts[tags[i]] = counts[tags[i]] ? counts[tags[i]] + 1 : 1;
+        }
+        return counts;
+    }
     this.loadFullData = dbwrapper(function() {
         if(typeof(this.db) !== undefined)ctx.tableData = this.db.prepare("SELECT * FROM docInfoTable").all();
+        //ctx.tagCounts = _exteactTags(ctx.tableData, "tags");
+        //ctx.journalCounts = _exteactTags(ctx.tableData, "journal");
     });
     _insertItem = dbwrapper(function(itemInfo, srcPath, dstPath){
         keys = Object.keys(itemInfo);
@@ -54,7 +66,7 @@ function DBManager(ctx) {
     });
     this.updateItemInfo = function(oriName){
         var d = new Date()
-        ctx.ctor.itemEditFormData.updateTime = d.toISOString().slice(0, 10) + ' ' + d.toTimeString().slice(0, 8);
+        ctx.ctor.itemEditFormData.updateTime = d.toLocaleDateString().replace(/\//g,'-').slice(0, 10) + ' ' + d.toTimeString().slice(0, 8);
         ctx.itemEditFormDataStandard = utils.deepcopy(ctx.ctor.itemEditFormData);
         var findItemId = 0;
         for(;findItemId < ctx.tableData.length && ctx.tableData[findItemId].name !== oriName; ++findItemId);

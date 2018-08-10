@@ -65,8 +65,8 @@ function DBManager(ctx) {
         return 0;
     });
     this.updateItemInfo = function(oriName){
-        var d = new Date()
-        ctx.ctor.itemEditFormData.updateTime = d.toLocaleDateString().replace(/\//g,'-').slice(0, 10) + ' ' + d.toTimeString().slice(0, 8);
+        var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        ctx.ctor.itemEditFormData.updateTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -5).replace('T', ' ');
         ctx.itemEditFormDataStandard = utils.deepcopy(ctx.ctor.itemEditFormData);
         var findItemId = 0;
         for(;findItemId < ctx.tableData.length && ctx.tableData[findItemId].name !== oriName; ++findItemId);

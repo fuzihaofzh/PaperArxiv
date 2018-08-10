@@ -23,12 +23,12 @@
 
 
 
-      <el-dialog title="配置" :visible.sync="itemConfigFormVisible" :show-close=false width="80%">
+      <el-dialog title="Config" :visible.sync="itemConfigFormVisible" :show-close=false width="80%">
           <el-form :model="itemConfigFormData">
-              <el-form-item label="路径">
+              <el-form-item label="Library Path">
                   <el-input v-model="itemConfigFormData.libpath" type="textarea" autosize auto-complete="off" ></el-input>
               </el-form-item>
-              <el-form-item label="期刊名">
+              <el-form-item label="Journals">
                   <el-input v-model="itemConfigFormData.ConferenceMap" type="textarea" autosize auto-complete="off"></el-input>
               </el-form-item>
 
@@ -48,13 +48,13 @@
                     <el-input v-model="itemEditFormData.title" type="textarea" autosize auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="Journal">
-                    <el-input v-model="itemEditFormData.journal" type="textarea" autosize auto-complete="off" @change="changNameByNewInfo"></el-input>
+                    <el-input v-model="itemEditFormData.journal" type="textarea" autosize auto-complete="off" @input="changNameByNewInfo"></el-input>
                 </el-form-item>
                 <el-form-item label="Authors">
-                    <el-input v-model="itemEditFormData.authors" type="textarea" autosize auto-complete="off" @change="changNameByNewInfo"></el-input>
+                    <el-input v-model="itemEditFormData.authors" type="textarea" autosize auto-complete="off" @input="changNameByNewInfo"></el-input>
                 </el-form-item>
                 <el-form-item label="Year">
-                    <el-input v-model="itemEditFormData.year" type="textarea" autosize auto-complete="off" @change="changNameByNewInfo"></el-input>
+                    <el-input v-model="itemEditFormData.year" type="textarea" autosize auto-complete="off" @input="changNameByNewInfo"></el-input>
                 </el-form-item>
                 <el-form-item label="tags">
                     <el-input v-model="itemEditFormData.tags" type="textarea" autosize auto-complete="off"></el-input>

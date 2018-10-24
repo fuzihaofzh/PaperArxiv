@@ -65,7 +65,15 @@ var ItemEdit = {
             this.$refs.searchBox.focus();
         },
         changNameByNewInfo: function() {
-            this.itemEditFormData.name = ([this.itemEditFormData.year, this.itemEditFormData.journal, this.itemEditFormData.authors.split('\n')[0]].join('-') + ".pdf").replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');
+            function makeName(arr){
+                return (arr.join('-') + ".pdf").replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');;
+            }
+            names = [this.itemEditFormData.year, this.itemEditFormData.journal, this.itemEditFormData.authors.split('\n')[0]];
+            this.itemEditFormData.name = makeName(names);
+            if(ctx.tableData.some(x=>{return x.name == this.itemEditFormData.name;})){
+                names.push(this.itemEditFormData.title.split(" ")[0]);
+                this.itemEditFormData.name = makeName(names);
+            };
         },
         openPdfFileWithSystemTool: function(val){
             shell.openItem(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));

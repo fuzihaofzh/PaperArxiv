@@ -90,7 +90,7 @@
             </el-table-column>
             <el-table-column prop="authors" label="Authors"  sortable>
                 <template slot-scope="table">
-              <p v-html="table.row.authors" style="white-space: pre-line"></p>
+              <p v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line"></p>
               <!--<el-input type="textarea" autosize v-model="table.row.authors" > </el-input>-->
             </template>
             </el-table-column>

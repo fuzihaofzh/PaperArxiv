@@ -93,7 +93,7 @@ function DBManager(ctx) {
       var regEx = new RegExp('(' + searchText + ')', "ig");
       function searchAndReplace(attrList, newRow){
         for (let key in ctx.showKeys){
-            newRow[attrList[key]] = '<p>' + newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>') + '</p>';
+            newRow[attrList[key]] = '<span>' + newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>') + '</span>';
         }
         return newRow;
       }

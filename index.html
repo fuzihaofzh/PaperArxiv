@@ -9,15 +9,30 @@
     <link rel="stylesheet" href="node_modules/element-ui/lib/theme-chalk/index.css">
 </head>
 
-<body style="overflow-y:hidden">
+<style>
+        /* Do not show the table header*/
+        .el-table__header-wrapper{
+            display: none !important;
+        }
+        td {background-color: #fdf6e3 }
+        td:hover {background-color: #F5F0E1 !important;}
+        .el-input__inner:{background-color: #fdf6e3 !important}
+        input {background-color: #fdf6e3 !important;}
+        input:focus {background-color: #fdf6e3;}
+        #el-main-table {background-color: #fdf6e3;}
+        .foot_tags { float:right; }
+</style>
+
+<body style="overflow-y:hidden" bgcolor="#fdf6e3">
     <div id="app">
         <div style="float:right; width:210px; margin-bottom: 8px;">
             <el-button icon="el-icon-plus" @click="openPdfFile">Add</el-button>
             <el-button icon="el-icon-setting" @click="itemConfigFormVisible = true">Config</el-button>
         </div>
         <div style="margin-right: 220px;margin-bottom: 8px;">
-            <el-input placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus v-on:input="searchContent" style="width:100%" ref="searchBox">
+            <el-input id="el-input-search" placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus v-on:input="searchContent" style="width:100%" ref="searchBox">
                 <el-button slot="append" icon="el-icon-search" @click="searchContent"></el-button>
+                <el-button id="el-input-clear-search" slot="append" style="display:none" @click="searchContent('')"></el-button>
             </el-input>
         </div>
 
@@ -71,43 +86,26 @@
             </div>
         </el-dialog>
 
-        <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'updateTime', order: 'descending'}" @cell-dblclick="onCellDBClick">
-            <!--<el-table-column type="expand">
+        <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
+            <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                 <template slot-scope="table">
-                <el-button size="small" @click="editRowInfo(table.row)">Edit</el-button>
-                <el-button size="small" type="danger" @click="deleteRowInfo(table.row)">Delete</el-button>
-              </template>
-            </el-table-column>-->
-            <el-table-column prop="name" label="Name" sortable>
-                <template slot-scope="table">
-                <p v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer"></p>
+                <big><strong v-html="table.row.title"></strong></big>
+                <span>&nbsp &nbsp</span>
+                <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;"></span>
+                <br>
+                <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#2B652A"></span>
+                <br> 
+                <span>&#x1F4DD</span>
+                <span v-html="table.row.comment"></span>
+                <span class="foot_tags">
+                    <span>&#x1F3F7</span>
+                    <span v-html="table.row.tags"></span>
+                    <span>&#x1F4C5</span>
+                    <span v-html="table.row.addTime"></span>
+                    <span >&#x270F</span>
+                    <span v-html="table.row.updateTime"></span>
+                </span>
                 </template>
-            </el-table-column>
-            <el-table-column prop="title" label="Title" sortable>
-                <template slot-scope="table">
-              <p v-html="table.row.title"></p>
-            </template>
-            </el-table-column>
-            <el-table-column prop="authors" label="Authors"  sortable>
-                <template slot-scope="table">
-              <p v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line"></p>
-              <!--<el-input type="textarea" autosize v-model="table.row.authors" > </el-input>-->
-            </template>
-            </el-table-column>
-            <el-table-column prop="tags" label="tags" sortable>
-                <template slot-scope="table">
-              <p v-html="table.row.tags"></p>
-            </template>
-            </el-table-column>
-            <el-table-column prop="comment" label="Notes" > <!--show-overflow-tooltip-->
-                <template slot-scope="table">
-              <p v-html="table.row.comment"></p>
-            </template>
-            </el-table-column>
-            <el-table-column prop="updateTime" label="Update Time" sortable>
-                <template slot-scope="table">
-              <p v-html="table.row.updateTime"></p>
-            </template>
             </el-table-column>
         </el-table>
     </div>

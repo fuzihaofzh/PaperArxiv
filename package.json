@@ -1,6 +1,6 @@
 {
     "name": "PaperArxiv",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "A paper management tool",
     "main": "main.js",
     "scripts": {

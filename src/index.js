@@ -14,7 +14,7 @@ ctx.dbManager = new DBManager(ctx);
 ctx.dbManager.loadFullData();
 
 ctx.fullKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'comment', 'addTime', 'updateTime'];
-ctx.showKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'updateTime'];
+ctx.showKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'addTime','updateTime'];
 var emptyData = {}
 ctx.fullKeys.forEach(x => emptyData[x] = "");
 var ItemEdit = {
@@ -79,11 +79,15 @@ var ItemEdit = {
             shell.openItem(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
         },
         searchContent: function(value){
+            this.userInputSearchText = value;
             if(this.userInputSearchText.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
             }else{
                 ctx.dbManager.searchItemInfo(this.userInputSearchText);
             }
+        },
+        sortTableItem: function(x, y){
+            return x.updateTime > y.updateTime;
         },
         editRowInfo: function(row){
             ctx.ctor.itemEditFormVisible = true;
@@ -114,6 +118,11 @@ new Ctor().$mount('#app');
 document.addEventListener('keyup', function (e){
     if (e.ctrlKey && e.keyCode == 82) {
         location.reload(true);
+    }}, false);
+document.addEventListener('keydown', function (e){
+    if (e.keyCode == 27) {
+        document.getElementById("el-input-search").value = "";
+        document.getElementById("el-input-clear-search").click();
     }}, false);
 // ======= set table size
 function updateWindowSize(){

@@ -43,7 +43,6 @@ function extractFromPdfFile(filePath, ctx) {
             break;
         }
     }
-    pdfInfo.name = ([pdfInfo.year, pdfInfo.journal, authors[0].replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" \n]/g, '')].join('-') + '.pdf').replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');
     pdfInfo.authors = authors.map(x => x.trim()).join('\n')
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
     pdfInfo.addTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -5).replace('T', ' ');
@@ -51,6 +50,30 @@ function extractFromPdfFile(filePath, ctx) {
     pdfInfo.content = child_process.execSync('pdftohtml -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');
     pdfInfo.tags = "";
     pdfInfo.comment = "";
+
+    // use gscholar to find bib info
+    if(ctx.configSettings.engines.gscholar){
+        try{
+            var data = child_process.execSync('gscholar "' + filePath + '"').toString();
+            title = data.match(/title={.*?}[,\n]/g);
+            if(title){
+                pdfInfo.title = title[0].slice(7, -2);
+            }
+            year = data.match(/year={\d+}/g);
+            if(year){
+                pdfInfo.year = Number(year[0].slice(6, -1));
+            }
+            authors = data.match(/author={.*?}[,\n]/g);
+            if(authors){
+                pdfInfo.authors = authors[0].slice(8, -2).replace(/,/g, ' ').replace(/ +/g, ' ').replace(/ and /g, '\n');
+            }
+        }catch(err){
+            ctx.error("gscholar command error:\n" + err);
+            return;
+        }
+    }
+    pdfInfo.name = ([pdfInfo.year, pdfInfo.journal, pdfInfo.authors.split('\n')[0].replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" \n]/g, '')].join('-') + '.pdf').replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');
+    console.log(pdfInfo.name);
     return pdfInfo;
 }
 function loadFile(ctx) {

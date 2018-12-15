@@ -37,6 +37,9 @@ function configManager(ctx){
               "arXiv": "arXiv",
               "Computer": "Computer",
               "IEEE": "IEEE"
+            },
+            "engines":{
+                "gscholar": true
             }
         };
 

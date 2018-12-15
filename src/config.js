@@ -39,7 +39,7 @@ function configManager(ctx){
               "IEEE": "IEEE"
             },
             "engines":{
-                "gscholar": true
+                "gscholar": false
             }
         };
 

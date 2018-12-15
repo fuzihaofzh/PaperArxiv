@@ -54,7 +54,7 @@ function extractFromPdfFile(filePath, ctx) {
     // use gscholar to find bib info
     if(ctx.configSettings.engines.gscholar){
         try{
-            var data = child_process.execSync('gscholar "' + filePath + '"').toString();
+            var data = child_process.execSync('gscholar "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}, "shell": "/bin/bash"}).toString();
             title = data.match(/title={.*?}[,\n]/g);
             if(title){
                 pdfInfo.title = title[0].slice(7, -2);
@@ -73,7 +73,6 @@ function extractFromPdfFile(filePath, ctx) {
         }
     }
     pdfInfo.name = ([pdfInfo.year, pdfInfo.journal, pdfInfo.authors.split('\n')[0].replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" \n]/g, '')].join('-') + '.pdf').replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');
-    console.log(pdfInfo.name);
     return pdfInfo;
 }
 function loadFile(ctx) {

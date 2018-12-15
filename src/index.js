@@ -120,9 +120,10 @@ document.addEventListener('keyup', function (e){
         location.reload(true);
     }}, false);
 document.addEventListener('keydown', function (e){
-    if (e.keyCode == 27) {
+    if (e.keyCode == 27) {// press esc, clean the input
         document.getElementById("el-input-search").value = "";
         document.getElementById("el-input-clear-search").click();
+        document.getElementById("el-input-search").focus();
     }}, false);
 // ======= set table size
 function updateWindowSize(){

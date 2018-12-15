@@ -89,20 +89,30 @@ function DBManager(ctx) {
         ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
     },
     this.searchItemInfo = function(searchText){
-      ctx.ctor.tableData = [];
-      var regEx = new RegExp('(' + searchText + ')', "ig");
-      function searchAndReplace(attrList, newRow){
-        for (let key in ctx.showKeys){
-            newRow[attrList[key]] = '<span>' + newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>') + '</span>';
+        function searchOneKeyword(candindateList, searchText){
+            if (!searchText) return candindateList;
+            newList = [];
+            var regEx = new RegExp('(' + searchText + ')', "ig");
+            function searchAndReplace(attrList, newRow){
+                for (let key in ctx.showKeys){
+                    newRow[attrList[key]] = '<span>' + newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>') + '</span>';
+                }
+                return newRow;
+            }
+            for (let key in candindateList) {
+                if(ctx.showKeys.some(function (x){return utils.strContain(candindateList[key][x], searchText)})){
+                var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
+                newList.push(searchAndReplace(ctx.showKeys, newRow));
+                }
+            }
+            return newList;
         }
-        return newRow;
-      }
-      for (let key in ctx.tableData) {
-        if(ctx.showKeys.some(function (x){return utils.strContain(ctx.tableData[key][x], searchText)})){
-          var newRow = utils.partialCopy(ctx.tableData[key], ctx.showKeys);
-          ctx.ctor.tableData.push(searchAndReplace(ctx.showKeys, newRow));
+        searchText = searchText.trim().split(/[ ]*\+[ ]*/g);
+        candindateList = ctx.tableData;
+        for (let word of searchText){
+            candindateList = searchOneKeyword(candindateList, word);
         }
-      }
+        ctx.ctor.tableData = candindateList;
     }
 }
 

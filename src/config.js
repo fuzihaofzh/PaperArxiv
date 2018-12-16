@@ -22,6 +22,8 @@ function configManager(ctx){
               "International Conference on Machine Learning": "ICML",
               "Empirical Methods in Natural Language Processing": "EMNLP",
               "NAACL": "NAACL",
+              "International Natural Language Generation": "INLG",
+              "SIGDIAL": "SIGDIAL",
               "Association for Computational Linguistics": "ACL",
               "International Joint Conference on Artificial Intelligence": "IJCAI",
               "Neural Information Processing Systems": "NIPS",
@@ -40,7 +42,8 @@ function configManager(ctx){
             },
             "engines":{
                 "gscholar": false
-            }
+            },
+            "search": "https://www.google.com/search?q="
         };
 
     }

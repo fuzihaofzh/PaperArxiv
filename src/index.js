@@ -2,6 +2,8 @@ const Vue = require('vue/dist/vue.js');
 const Element = require('element-ui');
 const shell = require('electron').shell;
 const path = require('path');
+const opn = require('opn');
+const stringSimilarity = require('string-similarity');
 const fileManager = require('./file.js');
 const configManager = require('./config.js');
 const utils = new (require('./utils.js').utils)();
@@ -33,6 +35,7 @@ var ItemEdit = {
             itemConfigFormVisible: false,
             tableData: utils.partialCopyArray(ctx.tableData, ctx.showKeys),
             userInputSearchText: "",
+            userTags: utils.getUserTags(ctx.tableData),
         }
     },
     methods: {
@@ -52,10 +55,11 @@ var ItemEdit = {
             this.$refs.searchBox.focus();
         },
         itemEditFormDataCancel: function(){
+            this.tagsBuffer = null;
             this.$refs.searchBox.focus();
         },
         itemConfigFormDataUpdate: function(){
-            var config = utils.stringToConfig(this.itemConfigFormData, ctx);
+            var config = utils.stringToConfig(this.itemConfigFormData);
             if(config == -1)return;
             ctx.configSettings = config;
             ctx.configManager.writeConfig();
@@ -63,6 +67,7 @@ var ItemEdit = {
             this.itemConfigFormData = utils.configToString(ctx.configSettings);
             location.reload(true);
             this.$refs.searchBox.focus();
+            this.tagsBuffer = null;
         },
         changNameByNewInfo: function() {
             function makeName(arr){
@@ -78,8 +83,40 @@ var ItemEdit = {
         openPdfFileWithSystemTool: function(val){
             shell.openItem(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
         },
+        searchTitleInBrowser: function(val){
+            var div = document.createElement("div");
+            div.innerHTML = val;
+            var text = div.textContent || div.innerText || "";      
+            opn(this.ctx.configSettings.search + text);
+        },
+        queryUserTagSuggestion: function(val, cb){
+            if(val.length == 0){
+                cb([]);
+                return;
+            }
+            if(val[val.length - 1] == ',' || val[val.length - 1] == ';'){
+                console.log(this.itemEditFormData.tags);
+                this.tagsBuffer = this.itemEditFormData.tags;
+            }
+            words = val.split(/[,;]/g);
+            sortedKeys = stringSimilarity.findBestMatch( words[words.length - 1], this.userTags.map(x => x.toLowerCase())).ratings;
+            for(i in sortedKeys){
+                sortedKeys[i].ori = this.userTags[i];
+            }
+            ratings = sortedKeys.sort(function (x, y)  {return y.rating - x.rating}).slice(0, 7);
+            candindates = []
+            for (word of ratings){
+                candindates.push({value: word.ori});
+            }
+            cb(candindates);
+        },
+        queryUserTagSelect: function(item){
+            if(!this.tagsBuffer) this.tagsBuffer = "";
+            this.tagsBuffer = this.tagsBuffer + (this.tagsBuffer.length > 0 && this.tagsBuffer[this.tagsBuffer.length - 1].trim() != ','  ? ',' : '') + item.value;
+            this.itemEditFormData.tags = this.tagsBuffer;
+        },
         searchContent: function(value){
-            this.userInputSearchText = value;
+            if(typeof (value) === 'string')this.userInputSearchText = value;
             if(this.userInputSearchText.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
             }else{
@@ -87,7 +124,7 @@ var ItemEdit = {
             }
         },
         sortTableItem: function(x, y){
-            return x.updateTime > y.updateTime;
+            return x.updateTime > y.updateTime? 1 : -1;
         },
         editRowInfo: function(row){
             ctx.ctor.itemEditFormVisible = true;

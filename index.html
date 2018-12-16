@@ -17,8 +17,8 @@
         td {background-color: #fdf6e3 }
         td:hover {background-color: #F5F0E1 !important;}
         .el-input__inner:{background-color: #fdf6e3 !important}
-        input {background-color: #fdf6e3 !important;}
-        input:focus {background-color: #fdf6e3;}
+        #el-input-search {background-color: #fdf6e3 !important;}
+        #el-input-search:focus {background-color: #fdf6e3;}
         #el-main-table {background-color: #fdf6e3;}
         .foot_tags { float:right; }
 </style>
@@ -38,21 +38,13 @@
 
 
 
-      <el-dialog title="Config" :visible.sync="itemConfigFormVisible" :show-close=false width="80%">
-          <el-form :model="itemConfigFormData">
-              <el-form-item label="Library Path">
-                  <el-input v-model="itemConfigFormData.libpath" type="textarea" autosize auto-complete="off" ></el-input>
-              </el-form-item>
-              <el-form-item label="Journals">
-                  <el-input v-model="itemConfigFormData.ConferenceMap" type="textarea" autosize auto-complete="off"></el-input>
-              </el-form-item>
-
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-              <el-button @click="itemConfigFormVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="itemConfigFormDataUpdate" autofocus>OK</el-button>
-          </div>
-      </el-dialog>
+        <el-dialog title="Config" :visible.sync="itemConfigFormVisible" :show-close=false width="80%">
+            <el-input v-model="itemConfigFormData" type="textarea" autosize auto-complete="off"></el-input>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="itemConfigFormVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="itemConfigFormDataUpdate" autofocus>OK</el-button>
+            </div>
+        </el-dialog>
 
         <el-dialog title="Edit Item" :visible.sync="itemEditFormVisible" :show-close=false width="80%">
             <el-form :model="itemEditFormData">
@@ -72,7 +64,7 @@
                     <el-input v-model="itemEditFormData.year" type="textarea" autosize auto-complete="off" @input="changNameByNewInfo"></el-input>
                 </el-form-item>
                 <el-form-item label="tags">
-                    <el-input v-model="itemEditFormData.tags" type="textarea" autosize auto-complete="off"></el-input>
+                    <el-autocomplete v-model="itemEditFormData.tags" :fetch-suggestions="queryUserTagSuggestion" @select="queryUserTagSelect" type="textarea" autosize auto-complete="off" style="width:100% !important"></el-input>
                 </el-form-item>
                 <el-form-item label="Notes">
                     <el-input v-model="itemEditFormData.comment" type="textarea" autosize auto-complete="off"></el-input>
@@ -89,7 +81,7 @@
         <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
             <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                 <template slot-scope="table">
-                <big><strong v-html="table.row.title"></strong></big>
+                <big><strong v-html="table.row.title" @click="searchTitleInBrowser(table.row.title)" style="cursor:pointer;"></strong></big>
                 <span>&nbsp &nbsp</span>
                 <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;"></span>
                 <br>

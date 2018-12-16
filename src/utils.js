@@ -29,17 +29,35 @@
         }
         return dst;
     };
-    this.configToString = function (config){
-        sc = this.deepcopy(config);
-        for(var i in sc){
-            if(typeof(sc[i]) == 'string') continue;
-            sc[i] = JSON.stringify(sc[i], null, '\t');
+    this.getUserTags = function (src){
+        function byCount(lst){
+            var itm, a= [], L= lst.length, o= {};
+            for(var i= 0; i<L; i++){
+                itm= lst[i];
+                if(!itm) continue;
+                if(o[itm]== undefined) o[itm]= 1;
+                else ++o[itm];
+            }
+            for(var p in o) a[a.length]= p;
+            return a.sort(function(a, b){
+                return o[b]-o[a];
+            });
         }
-        return sc;
+        tags = [];
+        for(var k of src){
+            tags = tags.concat(k['tags'].split(/[,;\n]/g));
+        }
+        tags = tags.map(x => x.trim());
+        tags = byCount(tags);
+        console.log(tags);
+        return tags;
+    };
+    this.configToString = function (config){
+        return JSON.stringify(config, null, '\t')
     }
-    this.stringToConfig = function (str, ctx){
+    this.stringToConfig = function (text){
         try{
-            sc['ConferenceMap'] = JSON.parse(sc['ConferenceMap']);
+            sc = JSON.parse(text);
         }catch(err){
             ctx.error("文献列表格式错误！");
             return -1;

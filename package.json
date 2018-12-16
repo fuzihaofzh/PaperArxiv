@@ -1,6 +1,6 @@
 {
     "name": "PaperArxiv",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "A paper management tool",
     "main": "main.js",
     "scripts": {
@@ -41,6 +41,8 @@
         "path": "0.12.7",
         "vue": "2.5.2",
         "xmldom": "0.1.27",
-        "xpath": "0.0.24"
+        "xpath": "0.0.24",
+        "opn": "5.4.0",
+        "string-similarity": "3.0.0"
     }
 }

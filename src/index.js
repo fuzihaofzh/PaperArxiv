@@ -127,6 +127,7 @@ var ItemEdit = {
             return x.updateTime > y.updateTime? 1 : -1;
         },
         editRowInfo: function(row){
+            this.tagsBuffer = null;
             ctx.ctor.itemEditFormVisible = true;
             ctx.updatePreviousItemName = row.name.replace(/<\/?[^>]+(>|$)/g, "");
             var findItem = ctx.tableData.filter(x => x.name == ctx.updatePreviousItemName);

@@ -68,8 +68,7 @@ function extractFromPdfFile(filePath, ctx) {
                 pdfInfo.authors = authors[0].slice(8, -2).replace(/,/g, ' ').replace(/ +/g, ' ').replace(/ and /g, '\n');
             }
         }catch(err){
-            ctx.error("gscholar command error:\n" + err);
-            return;
+            ctx.warn("gscholar command error:\n" + err);
         }
     }
     pdfInfo.name = ([pdfInfo.year, pdfInfo.journal, pdfInfo.authors.split('\n')[0].replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" \n]/g, '')].join('-') + '.pdf').replace(/[\%\/\<\>\^\|\?\&\#\*\\\:\" ]/g, '');

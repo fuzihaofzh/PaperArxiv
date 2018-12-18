@@ -83,11 +83,17 @@ var ItemEdit = {
         openPdfFileWithSystemTool: function(val){
             shell.openItem(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
         },
-        searchTitleInBrowser: function(val){
+        searchTitleInBrowser: function(val, method){
             var div = document.createElement("div");
             div.innerHTML = val;
-            var text = div.textContent || div.innerText || "";      
-            opn(this.ctx.configSettings.search + text);
+            var text = div.textContent || div.innerText || "";
+            if(method == 'search'){
+                opn(this.ctx.configSettings.search + text);
+            }else if(method == 'github'){
+                opn("https://www.google.com.hk/search?hl=en&q=" + encodeURI('site:github.com ' + text) + "&btnI=1");
+            }else if(method == 'dblp'){
+                opn("https://dblp.uni-trier.de/search?q=" + encodeURI(text))
+            }
         },
         queryUserTagSuggestion: function(val, cb){
             if(val.length == 0){

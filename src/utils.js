@@ -49,7 +49,6 @@
         }
         tags = tags.map(x => x.trim());
         tags = byCount(tags);
-        console.log(tags);
         return tags;
     };
     this.configToString = function (config){

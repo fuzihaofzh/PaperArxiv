@@ -14,7 +14,7 @@ PaperArxiv is a new paper management tool that help to organise your mind. It fo
 
 ## Getting Start
 1. [Download](https://github.com/fuzihaofzh/PaperArxiv/releases) PaperArxiv;
-2. Unzip the file and put the app into your Application floder;
+2. Unzip the file and put the app into your Application folder;
 3. Open PaperArxiv;
 4. Click `Add` Button to select a paper in pdf format, Paper will automatically generate a new item;
 5. Double Click the item and add some notes;

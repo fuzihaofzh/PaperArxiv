@@ -24,7 +24,7 @@
     "author": "Maple",
     "license": "MIT",
     "devDependencies": {
-        "electron": "~1.8.7",
+        "electron": "~9.1.0",
         "electron-rebuild": "^1.6.0",
         "electron-packager": "9.0.0",
         "electron-installer-debian": "0.5.2",

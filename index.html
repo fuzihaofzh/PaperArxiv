@@ -95,11 +95,11 @@
                 <span>&#x1F4DD</span>
                 <span v-html="table.row.comment"></span>
                 <span class="foot_tags">
+                    <span>&#x1F3F7</span>
+                    <span v-html="table.row.tags"></span>
                     <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
                     <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>
                     <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="search_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
-                    <span>&#x1F3F7</span>
-                    <span v-html="table.row.tags"></span>
                     <span>&#x1F4C5</span>
                     <span v-html="table.row.addTime"></span>
                     <span >&#x270F</span>

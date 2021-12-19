@@ -27,7 +27,7 @@ function createWindow () {
 
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+   mainWindow.webContents.openDevTools()
 
   // Check if we are on a MAC
 	if (process.platform === 'darwin') {

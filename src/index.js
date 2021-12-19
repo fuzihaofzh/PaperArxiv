@@ -93,6 +93,8 @@ var ItemEdit = {
                 opn("https://www.google.com.hk/search?hl=en&q=" + encodeURI('site:github.com ' + text) + "&btnI=1");
             }else if(method == 'dblp'){
                 opn("https://dblp.uni-trier.de/search?q=" + encodeURI(text))
+            }else if(method == 'googlescholar'){
+                opn("https://scholar.google.com/scholar?q=" + encodeURI(text))
             }
         },
         queryUserTagSuggestion: function(val, cb){
@@ -125,9 +127,10 @@ var ItemEdit = {
             if(typeof (value) === 'string')this.userInputSearchText = value;
             if(this.userInputSearchText.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
-            }else{
+            }else if(this.userInputSearchText.length > 1){
                 ctx.dbManager.searchItemInfo(this.userInputSearchText);
             }
+            setTimeout(renderKatex, 1);
         },
         sortTableItem: function(x, y){
             return x.updateTime > y.updateTime? 1 : -1;
@@ -174,6 +177,23 @@ function updateWindowSize(){
     var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     document.getElementById('el-main-table').setAttribute("style","height:" + (height - 60).toString() + "px");
 }
+
+function renderKatex() {
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\[', right: '\\]', display: true}
+      ],
+      // • rendering keys, e.g.:
+      throwOnError : false
+    });
+}
+
+document.addEventListener("DOMContentLoaded", renderKatex);
 
 window.addEventListener('resize', function (e){
       updateWindowSize();

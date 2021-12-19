@@ -24,25 +24,27 @@
     "author": "Maple",
     "license": "MIT",
     "devDependencies": {
+        "ava": "0.22.0",
         "electron": "~1.8.7",
-        "electron-rebuild": "^1.6.0",
-        "electron-packager": "9.0.0",
-        "electron-installer-debian": "0.5.2",
-        "vue-devtools": "3.1.6",
         "electron-builder": "^19.27.2",
+        "electron-installer-debian": "0.5.2",
+        "electron-packager": "9.0.0",
+        "electron-rebuild": "^1.6.0",
         "electron-winstaller": "2.6.3",
-        "ava": "0.22.0"
+        "vue-devtools": "3.1.6"
     },
     "dependencies": {
         "better-sqlite3": "4.1.2",
         "child_process": "1.0.2",
         "element-ui": "2.0.11",
         "home-dir": "1.0.0",
+        "katex": "^0.15.1",
+        "opn": "5.4.0",
         "path": "0.12.7",
+        "string-similarity": "3.0.0",
         "vue": "2.5.2",
         "xmldom": "0.1.27",
-        "xpath": "0.0.24",
-        "opn": "5.4.0",
-        "string-similarity": "3.0.0"
+        "katex": "0.15.1",
+        "xpath": "0.0.24"
     }
 }

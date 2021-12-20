@@ -99,7 +99,7 @@
                 <span v-html="table.row.comment"></span>
                 <span class="foot_tags">
                     <span>&#x1F3F7</span>
-                    <span v-html="table.row.tags"></span>
+                    <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini"> <span v-html="item" @click="searchContent(item.replace(/<[^>]*>?/gm, ''), ['tags']);"></span> </el-tag> </span>
                     <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
                     <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
                     <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>

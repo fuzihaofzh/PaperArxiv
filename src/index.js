@@ -52,6 +52,7 @@ var ItemEdit = {
                 ctx.dbManager.InsertItemInfo();
             }
             this.searchContent();
+            this.userTags = utils.getUserTags(ctx.tableData);
             this.$refs.searchBox.focus();
         },
         itemEditFormDataCancel: function(){
@@ -123,12 +124,12 @@ var ItemEdit = {
             this.tagsBuffer = this.tagsBuffer + (this.tagsBuffer.length > 0 && this.tagsBuffer[this.tagsBuffer.length - 1].trim() != ','  ? ',' : '') + item.value;
             this.itemEditFormData.tags = this.tagsBuffer;
         },
-        searchContent: function(value){
+        searchContent: function(value, domains = ctx.showKeys){
             if(typeof (value) === 'string')this.userInputSearchText = value;
             if(this.userInputSearchText.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
             }else if(this.userInputSearchText.length > 1){
-                ctx.dbManager.searchItemInfo(this.userInputSearchText);
+                ctx.dbManager.searchItemInfo(this.userInputSearchText, domains);
             }
             setTimeout(renderKatex, 1);
         },

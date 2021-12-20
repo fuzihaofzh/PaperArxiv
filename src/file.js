@@ -48,7 +48,7 @@ function extractFromPdfFile(filePath, ctx) {
     pdfInfo.addTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -5).replace('T', ' ');
     pdfInfo.updateTime = pdfInfo.addTime;
     pdfInfo.content = child_process.execSync('pdftohtml -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');
-    pdfInfo.tags = "";
+    pdfInfo.tags = searchTags([pdfInfo.title, pdfInfo.abstract, pdfInfo.content].join(' '), ctx);
     pdfInfo.comment = "";
 
     // use gscholar to find bib info
@@ -97,6 +97,17 @@ function loadFile(ctx) {
             ctx.ctor.userInputSearchText = "";
         });
     });
+}
+
+function searchTags(text, ctx){
+    text = text.toLowerCase()
+    tags = []
+    for(tag of ctx.ctor.userTags){
+        if(utils.strContain(text, " " + tag.toLowerCase() + " ")){
+            tags.push(tag);
+        }
+    }
+    return tags.join(',')
 }
 
 module.exports = {

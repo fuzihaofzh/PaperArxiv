@@ -88,21 +88,21 @@ function DBManager(ctx) {
         ctx.tableData.splice(findItemId, 1);
         ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
     },
-    this.searchItemInfo = function(searchText){
+    this.searchItemInfo = function(searchText, domains = ctx.showKeys){
         function searchOneKeyword(candindateList, searchText){
             if (!searchText) return candindateList;
             newList = [];
             var regEx = new RegExp('(' + searchText + ')', "ig");
             function searchAndReplace(attrList, newRow){
-                for (let key in ctx.showKeys){
-                    newRow[attrList[key]] = '<span>' + newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>') + '</span>';
+                for (let key in domains){
+                    newRow[attrList[key]] = newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>');
                 }
                 return newRow;
             }
             for (let key in candindateList) {
-                if(ctx.showKeys.some(function (x){return utils.strContain(candindateList[key][x], searchText)})){
+                if(domains.some(function (x){return utils.strContain(candindateList[key][x], searchText)})){
                 var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
-                newList.push(searchAndReplace(ctx.showKeys, newRow));
+                newList.push(searchAndReplace(domains, newRow));
                 }
             }
             return newList;

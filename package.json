@@ -25,7 +25,7 @@
     "license": "MIT",
     "devDependencies": {
         "ava": "0.22.0",
-        "electron": "~1.8.7",
+        "electron": "~11.5.0",
         "electron-builder": "^19.27.2",
         "electron-installer-debian": "0.5.2",
         "electron-packager": "9.0.0",

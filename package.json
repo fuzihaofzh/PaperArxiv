@@ -34,17 +34,16 @@
         "vue-devtools": "3.1.6"
     },
     "dependencies": {
-        "better-sqlite3": "4.1.2",
+        "better-sqlite3": "5.4.0",
         "child_process": "1.0.2",
         "element-ui": "2.0.11",
         "home-dir": "1.0.0",
-        "katex": "^0.15.1",
+        "katex": "0.15.1",
         "opn": "5.4.0",
         "path": "0.12.7",
         "string-similarity": "3.0.0",
         "vue": "2.5.2",
         "xmldom": "0.1.27",
-        "katex": "0.15.1",
         "xpath": "0.0.24"
     }
 }

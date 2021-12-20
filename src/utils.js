@@ -51,6 +51,39 @@
         tags = byCount(tags);
         return tags;
     };
+    this.getUserLibraryTree = function (src){
+        tree = [{name : "Library"}];
+        icons = ["📦", "🗂️", "📚", "📘"];
+        function addNode(node, pathSeg, deepth, fullPath){
+            // addNode(tree, ["Library", "aaa", "bbb"]);
+            if (pathSeg.length == 0) return;
+            var hasNode = false;
+            for (r of node){
+                if (pathSeg[0] == r.name){
+                    hasNode = true;
+                    break;
+                }
+            }
+            if (!hasNode){
+                r = {name : pathSeg[0]}
+                node.push(r);
+            }
+            if (r.count == undefined) r.count = 0;
+            r.count += 1
+            r.label = icons[deepth] + r.name + "(" + r.count.toString() + ")";
+            r.path = fullPath + "/" + r.name;
+            if (pathSeg.length > 1 && r.children == undefined)r.children = [];
+            addNode(r.children, pathSeg.slice(1, pathSeg.length), deepth + 1, r.path);
+        };
+        for(var k of src){
+            for(path of k['libraryPath'].split(/[\n]/g)){
+                pathSeg = path.split('/');
+                if(pathSeg[0] == "")pathSeg = pathSeg.slice(1, pathSeg.length);
+                addNode(tree, pathSeg, 0, "");
+            }
+        }
+        return tree;
+    };
     this.configToString = function (config){
         return JSON.stringify(config, null, '\t')
     }

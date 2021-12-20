@@ -12,7 +12,9 @@ function DBManager(ctx) {
                 return;
             }
             ctx.dbTableName = "docInfoTable";
-            db.prepare("create table if not exists " + ctx.dbTableName + "(name text NOT NULL PRIMARY KEY, title text, authors text, year text, journal text, tags text, comment text, addTime datetime, updateTime datetime, content text)").run();
+            db.prepare("create table if not exists " + ctx.dbTableName + "(name text NOT NULL PRIMARY KEY, title text, authors text, year text, journal text, tags text, comment text, addTime datetime, updateTime datetime, content text, libraryPath text)").run();
+            //ctx.metaTableName = "metaInfoTable";
+            //db.prepare("create table if not exists " + ctx.metaTableName + " (name text NOT NULL PRIMARY KEY, info text)");
             this.db = db;
 
             func(...args);
@@ -77,6 +79,10 @@ function DBManager(ctx) {
         _deleteItem(oriName);
         _insertItem(ctx.itemEditFormDataStandard, path.join(ctx.configSettings.libpath, oriName), path.join(ctx.configSettings.libpath, ctx.itemEditFormDataStandard.name));
         ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
+    }
+    this.updateItemInfoFixName = function(item){
+        _deleteItem(item.name);
+        _insertItem(item, "", "");
     }
     this.deleteItemInfo = function(name){
         _deleteItem(name);

@@ -15,10 +15,9 @@ ctx.configManager = new (require('./config.js').configManager)(ctx);
 ctx.dbManager = new DBManager(ctx);
 ctx.dbManager.loadFullData();
 
-ctx.fullKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'comment', 'addTime', 'updateTime'];
-ctx.showKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'addTime','updateTime'];
+ctx.showKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'addTime','updateTime', 'libraryPath'];
 var emptyData = {}
-ctx.fullKeys.forEach(x => emptyData[x] = "");
+ctx.showKeys.forEach(x => emptyData[x] = "");
 var ItemEdit = {
     data() {
         return {
@@ -36,6 +35,7 @@ var ItemEdit = {
             tableData: utils.partialCopyArray(ctx.tableData, ctx.showKeys),
             userInputSearchText: "",
             userTags: utils.getUserTags(ctx.tableData),
+            treePath: utils.getUserLibraryTree(ctx.tableData),
         }
     },
     methods: {
@@ -51,8 +51,9 @@ var ItemEdit = {
             }else{
                 ctx.dbManager.InsertItemInfo();
             }
-            this.searchContent();
+            this.searchContent(this.userInputSearchText);
             this.userTags = utils.getUserTags(ctx.tableData);
+            this.treePath = utils.getUserLibraryTree(ctx.tableData);
             this.$refs.searchBox.focus();
         },
         itemEditFormDataCancel: function(){
@@ -104,7 +105,6 @@ var ItemEdit = {
                 return;
             }
             if(val[val.length - 1] == ',' || val[val.length - 1] == ';'){
-                console.log(this.itemEditFormData.tags);
                 this.tagsBuffer = this.itemEditFormData.tags;
             }
             words = val.split(/[,;]/g);
@@ -124,12 +124,12 @@ var ItemEdit = {
             this.tagsBuffer = this.tagsBuffer + (this.tagsBuffer.length > 0 && this.tagsBuffer[this.tagsBuffer.length - 1].trim() != ','  ? ',' : '') + item.value;
             this.itemEditFormData.tags = this.tagsBuffer;
         },
-        searchContent: function(value, domains = ctx.showKeys){
-            if(typeof (value) === 'string')this.userInputSearchText = value;
-            if(this.userInputSearchText.length == 0){
+        searchContent: function(searchValue, domains = ctx.showKeys, updateSearchBox = true){
+            if(typeof (searchValue) === 'string' && updateSearchBox)this.userInputSearchText = searchValue;
+            if(searchValue.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
-            }else if(this.userInputSearchText.length > 1){
-                ctx.dbManager.searchItemInfo(this.userInputSearchText, domains);
+            }else if(searchValue.length > 1){
+                ctx.dbManager.searchItemInfo(searchValue, domains);
             }
             setTimeout(renderKatex, 1);
         },
@@ -157,6 +157,28 @@ var ItemEdit = {
         },
         onCellDBClick: function(row, column, cell, event){
             this.editRowInfo(row);
+        },
+        handleLibraryNodeClick(node) {
+            this.searchContent(node.path, domains = ["libraryPath"], false);
+        },
+        handleLibraryNodeDrop(e){
+            var name=e.dataTransfer.getData("text");
+            var path = e.target.getAttribute("path")
+            for(item of ctx.tableData){
+                if(item.name == name){
+                    pathSeg = item.libraryPath.split("\n");
+                    if(!pathSeg.includes(path)){
+                        item.libraryPath += "\n" + path;
+                        ctx.dbManager.updateItemInfoFixName(item);
+                        this.treePath = utils.getUserLibraryTree(ctx.tableData);
+                    }
+                    break;
+                }
+            }
+            console.log(this.tableData)
+        },
+        handleItemIconDrag(e){
+            e.dataTransfer.setData("text", e.target.getAttribute("name"));
         }
     }
 }
@@ -194,10 +216,11 @@ function renderKatex() {
     });
 }
 
+
 document.addEventListener("DOMContentLoaded", renderKatex);
 
 window.addEventListener('resize', function (e){
       updateWindowSize();
     }, true);
 
-updateWindowSize();
+setTimeout(updateWindowSize, 1);

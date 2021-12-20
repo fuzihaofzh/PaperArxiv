@@ -49,6 +49,7 @@ function extractFromPdfFile(filePath, ctx) {
     pdfInfo.updateTime = pdfInfo.addTime;
     pdfInfo.content = child_process.execSync('pdftohtml -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');
     pdfInfo.tags = searchTags([pdfInfo.title, pdfInfo.abstract, pdfInfo.content].join(' '), ctx);
+    pdfInfo.libraryPath = "/Library";
     pdfInfo.comment = "";
 
     // use gscholar to find bib info

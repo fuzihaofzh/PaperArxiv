@@ -24,6 +24,18 @@
         #el-input-search:focus {background-color: #fdf6e3;}
         #el-main-table {background-color: #fdf6e3;}
         .foot_tags { float:right; }
+        .el-tree{
+            background: rgba(0,0,0,0);
+        }
+        .el-tree-node.is-current > .el-tree-node__content {
+            background-color: #ebe3cc !important;
+        }
+        .el-tree-node__content:active {background-color: #ebe3cc !important;
+        }
+        .el-tree-node__content:hover {background-color: #f0f2df !important;
+        }
+        
+
         img{
             opacity: .6;
             cursor:pointer;
@@ -74,6 +86,8 @@
                 <el-form-item label="tags">
                     <el-autocomplete v-model="itemEditFormData.tags" :fetch-suggestions="queryUserTagSuggestion" @select="queryUserTagSelect" type="textarea" autosize auto-complete="off" style="width:100% !important"></el-input>
                 </el-form-item>
+                <el-form-item label="Library Path">
+                    <el-input v-model="itemEditFormData.libraryPath" type="textarea" autosize auto-complete="off"></el-input>
                 <el-form-item label="Notes">
                     <el-input v-model="itemEditFormData.comment" type="textarea" autosize auto-complete="off"></el-input>
                 </el-form-item>
@@ -86,32 +100,44 @@
             </div>
         </el-dialog>
 
-        <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
-            <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
-                <template slot-scope="table">
-                <big><strong v-html="table.row.title"></strong></big>
-                <span>&nbsp &nbsp</span>
-                <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;"></span>
-                <br>
-                <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#2B652A"></span>
-                <br> 
-                <span>&#x1F4DD</span>
-                <span v-html="table.row.comment"></span>
-                <span class="foot_tags">
-                    <span>&#x1F3F7</span>
-                    <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini"> <span v-html="item" @click="searchContent(item.replace(/<[^>]*>?/gm, ''), ['tags']);"></span> </el-tag> </span>
-                    <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
-                    <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
-                    <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>
-                    <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="search_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
-                    <span>&#x1F4C5</span>
-                    <span v-html="table.row.addTime"></span>
-                    <span >&#x270F</span>
-                    <span v-html="table.row.updateTime"></span>
-                </span>
-                </template>
-            </el-table-column>
-        </el-table>
+        <el-container style="border: 1px;" >
+            <el-aside width="200px">
+                <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick" >
+                    <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <div @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node">
+                        {{ node.label }}
+                        </div>
+                    </span>
+                </el-tree>
+            </el-aside>
+
+            <el-main>
+                <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
+                    <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
+                        <template slot-scope="table">
+                        <big><span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)">&#x1F4C4</span>&nbsp<strong v-html="table.row.title"></strong></big>
+                        <span>&nbsp &nbsp</span>
+                        <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;"></span>
+                        <br>
+                        <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#2B652A"></span>
+                        <br> 
+                        <span v-html="table.row.comment"></span>
+                        <span class="foot_tags">
+                            <span>&#x1F3F7</span>
+                            <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini"> <span v-html="item" @click="searchContent(item.replace(/<[^>]*>?/gm, ''), ['tags'], false);"></span> </el-tag> </span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="search_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
+                            <span>&#x1F4C5</span>
+                            <span v-html="table.row.addTime"></span>
+                            <span >&#x270F</span>
+                            <span v-html="table.row.updateTime"></span>
+                        </span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-main>
     </div>
 
 

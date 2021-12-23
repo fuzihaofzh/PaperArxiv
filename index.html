@@ -32,8 +32,11 @@
         }
         .el-tree-node__content:active {background-color: #ebe3cc !important;
         }
-        .el-tree-node__content:hover {background-color: #f0f2df !important;
+        .el-tree-node__content:hover {background-color: #f9f2df !important;
         }
+        .tag-list{background: rgba(0,0,0,0);}
+        .tag-list:hover{cursor: pointer; background-color: #f9f2df}
+        .tag-list:active{ background-color: #858071}
         
 
         img{
@@ -109,6 +112,10 @@
                         </div>
                     </span>
                 </el-tree>
+                <el-divider></el-divider>
+                <div v-for="(value,key,index) in userTags">
+                <el-tag size="mini" class="tag-list"> <span v-html="key + '(' + value.toString() + ')'" @click="searchContent(key.replace(/<[^>]*>?/gm, ''), ['tags'], false);"></span> </el-tag>
+                </div>
             </el-aside>
 
             <el-main>

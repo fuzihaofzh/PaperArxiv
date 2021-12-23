@@ -39,9 +39,12 @@
                 else ++o[itm];
             }
             for(var p in o) a[a.length]= p;
-            return a.sort(function(a, b){
+            a = a.sort(function(a, b){
                 return o[b]-o[a];
             });
+            res = {};
+            a.forEach(x => res[x] = o[x]);
+            return res
         }
         tags = [];
         for(var k of src){
@@ -49,6 +52,7 @@
         }
         tags = tags.map(x => x.trim());
         tags = byCount(tags);
+        console.log(tags)
         return tags;
     };
     this.getUserLibraryTree = function (src){

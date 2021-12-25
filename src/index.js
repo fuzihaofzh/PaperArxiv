@@ -1,5 +1,5 @@
-const Vue = require('vue/dist/vue.js');
-const Element = require('element-ui');
+//const Vue = require('vue/dist/vue.js');
+//const Element = require('element-ui');
 const shell = require('electron').shell;
 const path = require('path');
 const opn = require('opn');
@@ -108,9 +108,10 @@ var ItemEdit = {
                 this.tagsBuffer = this.itemEditFormData.tags;
             }
             words = val.split(/[,;]/g);
-            sortedKeys = stringSimilarity.findBestMatch( words[words.length - 1], this.userTags.map(x => x.toLowerCase())).ratings;
+            var userTagKeys = Object.keys(this.userTags);
+            sortedKeys = stringSimilarity.findBestMatch( words[words.length - 1], userTagKeys.map(x => x.toLowerCase())).ratings;
             for(i in sortedKeys){
-                sortedKeys[i].ori = this.userTags[i];
+                sortedKeys[i].ori = userTagKeys[i];
             }
             ratings = sortedKeys.sort(function (x, y)  {return y.rating - x.rating}).slice(0, 7);
             candindates = []
@@ -128,7 +129,7 @@ var ItemEdit = {
             if(typeof (searchValue) === 'string' && updateSearchBox)this.userInputSearchText = searchValue;
             if(searchValue.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
-            }else if(searchValue.length > 1){
+            }else if(searchValue.length >= 1){
                 ctx.dbManager.searchItemInfo(searchValue, domains);
             }
             setTimeout(renderKatex, 1);
@@ -160,6 +161,7 @@ var ItemEdit = {
         },
         handleLibraryNodeClick(node) {
             this.searchContent(node.path, domains = ["libraryPath"], false);
+            this.clearAllLeftTags();
         },
         handleLibraryNodeDrop(e){
             var name=e.dataTransfer.getData("text");
@@ -175,14 +177,38 @@ var ItemEdit = {
                     break;
                 }
             }
-            console.log(this.tableData)
         },
         handleItemIconDrag(e){
             e.dataTransfer.setData("text", e.target.getAttribute("name"));
+        },
+        leftTagClick(e) {
+            if (e.target.parentElement.getAttribute("mtag") !== null){
+                var tagname = e.target.parentElement.getAttribute("mtag").replace(/<[^>]*>?/gm, '');
+                alltags = document.getElementsByClassName("tag-list");
+                for (tag of alltags){
+                    if(tag.getAttribute("etag").replace(/<[^>]*>?/gm, '') == tagname){
+                        tag.children[0].click();
+                        return;
+                    }
+                }
+            }
+            e.target.parentElement.classList.toggle("tag-list-toggle");
+            //e.target.parentElement.style.background = "#5A9CF8";
+            selected = document.getElementsByClassName("tag-list-toggle");
+            stags = []
+            for(span of selected){
+                stags.push(span.getAttribute("etag").replace(/<[^>]*>?/gm, ''));
+            }
+            this.searchContent('(' + stags.join('|') + ')', ['tags'], true);
+        },
+        clearAllLeftTags(){
+            selected = document.getElementsByClassName("tag-list-toggle");
+            for(var i = selected.length - 1; i >= 0; i-- ){
+                selected[i].classList.toggle("tag-list-toggle");
+            }
         }
     }
 }
-Vue.use(Element);
 var Ctor = Vue.extend(ItemEdit);
 new Ctor().$mount('#app');
 document.addEventListener('keyup', function (e){
@@ -194,6 +220,7 @@ document.addEventListener('keydown', function (e){
         document.getElementById("el-input-search").value = "";
         document.getElementById("el-input-clear-search").click();
         document.getElementById("el-input-search").focus();
+        ctx.ctor.clearAllLeftTags();
     }}, false);
 // ======= set table size
 function updateWindowSize(){

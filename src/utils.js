@@ -52,13 +52,12 @@
         }
         tags = tags.map(x => x.trim());
         tags = byCount(tags);
-        console.log(tags)
         return tags;
     };
     this.getUserLibraryTree = function (src){
         tree = [{name : "Library"}];
         icons = ["📦", "🗂️", "📚", "📘"];
-        function addNode(node, pathSeg, deepth, fullPath){
+        function addNode(node, pathSeg, deepth, fullPath, name){
             // addNode(tree, ["Library", "aaa", "bbb"]);
             if (pathSeg.length == 0) return;
             var hasNode = false;
@@ -72,18 +71,28 @@
                 r = {name : pathSeg[0]}
                 node.push(r);
             }
-            if (r.count == undefined) r.count = 0;
-            r.count += 1
+            if (r.count == undefined){ 
+                r.count = 0;
+                r.subitem = new Set();
+            }
+            r.subitem.add(name);
+            r.count = r.subitem.size;
             r.label = icons[deepth] + r.name + "(" + r.count.toString() + ")";
             r.path = fullPath + "/" + r.name;
             if (pathSeg.length > 1 && r.children == undefined)r.children = [];
-            addNode(r.children, pathSeg.slice(1, pathSeg.length), deepth + 1, r.path);
+            addNode(r.children, pathSeg.slice(1, pathSeg.length), deepth + 1, r.path, name);
         };
         for(var k of src){
-            for(path of k['libraryPath'].split(/[\n]/g)){
+            paths = k['libraryPath'].split(/[\n]/g);
+            if (paths.find(o => o === '/Library') == undefined){
+                k['libraryPath'] = '/Library\n' + k['libraryPath'];
+                paths = ['/Library'].concat(paths);
+            }
+            //epath = k['libraryPath'] + '\n/Library';
+            for(path of paths){
                 pathSeg = path.split('/');
                 if(pathSeg[0] == "")pathSeg = pathSeg.slice(1, pathSeg.length);
-                addNode(tree, pathSeg, 0, "");
+                addNode(tree, pathSeg, 0, "", k.name);
             }
         }
         return tree;

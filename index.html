@@ -10,40 +10,46 @@
     <link rel="stylesheet" href="node_modules/katex/dist/katex.min.css">
     <script defer src="node_modules/katex/dist/katex.min.js"></script>
     <script defer src="node_modules/katex/dist/contrib/auto-render.min.js"></script>
+    <script src="node_modules/vue/dist/vue.js"></script>
+    <script src="node_modules/element-ui/lib/index.js"></script>
 </head>
 
 <style>
-        /* Do not show the table header*/
-        .el-table__header-wrapper{
-            display: none !important;
-        }
-        td {background-color: #fdf6e3 ;font-size:120%}
-        td:hover {background-color: #F5F0E1 !important;}
-        .el-input__inner:{background-color: #fdf6e3 !important}
-        #el-input-search {background-color: #fdf6e3 !important;}
-        #el-input-search:focus {background-color: #fdf6e3;}
-        #el-main-table {background-color: #fdf6e3;}
-        .foot_tags { float:right; }
-        .el-tree{
-            background: rgba(0,0,0,0);
-        }
-        .el-tree-node.is-current > .el-tree-node__content {
-            background-color: #ebe3cc !important;
-        }
-        .el-tree-node__content:active {background-color: #ebe3cc !important;
-        }
-        .el-tree-node__content:hover {background-color: #f9f2df !important;
-        }
-        .tag-list{background: rgba(0,0,0,0);}
-        .tag-list:hover{cursor: pointer; background-color: #f9f2df}
-        .tag-list:active{ background-color: #858071}
-        
+    /* Do not show the table header*/
+    .el-table__header-wrapper{
+        display: none !important;
+    }
+    td {background-color: #fdf6e3 ;font-size:120%}
+    td:hover {background-color: #F5F0E1 !important;}
+    .el-input__inner:{background-color: #fdf6e3 !important}
+    #el-input-search {background-color: #fdf6e3 !important;}
+    #el-input-search:focus {background-color: #fdf6e3;}
+    #el-main-table {background-color: #fdf6e3;}
+    .foot_tags { float:right; }
+    .el-tree{
+        background: rgba(0,0,0,0);
+        min-width: 100%;
+        display: inline-block !important;
+    }
 
-        img{
-            opacity: .6;
-            cursor:pointer;
-            width: 1em;
-        }
+    .el-tree-node.is-current > .el-tree-node__content {
+        background-color: #ebe3cc !important;
+    }
+    .el-tree-node__content:active {background-color: #ebe3cc !important;
+    }
+    .el-tree-node__content:hover {background-color: #f9f2df !important;
+    }
+    .tag-list{ background: rgba(0,0,0,0);}
+    .tag-list:hover{cursor: pointer; background-color: #EEF5FE}
+    .tag-list-toggle{ background: #5A9CF8;color:white;}
+    .tag-list-toggle:hover{ background: #5A9CF8;color:white;}
+    
+    
+    img{
+        opacity: .6;
+        cursor:pointer;
+        width: 1em;
+    }
 </style>
 
 <body style="overflow-y:hidden" bgcolor="#fdf6e3">
@@ -105,6 +111,7 @@
 
         <el-container style="border: 1px;" >
             <el-aside width="200px">
+                <el-scrollbar style="position: fixed; height: 45%; width: 30%">
                 <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick" >
                     <span class="custom-tree-node" slot-scope="{ node, data }">
                         <div @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node">
@@ -112,13 +119,16 @@
                         </div>
                     </span>
                 </el-tree>
-                <el-divider></el-divider>
-                <div v-for="(value,key,index) in userTags">
-                <el-tag size="mini" class="tag-list"> <span v-html="key + '(' + value.toString() + ')'" @click="searchContent(key.replace(/<[^>]*>?/gm, ''), ['tags'], false);"></span> </el-tag>
+                </el-scrollbar>
+
+                <el-scrollbar style="top:55%; height: 50%">
+                <div v-for="(value,key,index) in userTags" style="display:inline">
+                <el-tag size="mini" class="tag-list" :etag="key"> <span v-html="key + '(' + value.toString() + ')'" @click="leftTagClick($event);" ></span> </el-tag>
                 </div>
+                </el-scrollbar>
             </el-aside>
 
-            <el-main>
+            <el-main style="padding:0;margin: 0;">
                 <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
                     <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                         <template slot-scope="table">
@@ -131,7 +141,7 @@
                         <span v-html="table.row.comment"></span>
                         <span class="foot_tags">
                             <span>&#x1F3F7</span>
-                            <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini"> <span v-html="item" @click="searchContent(item.replace(/<[^>]*>?/gm, ''), ['tags'], false);"></span> </el-tag> </span>
+                            <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini" :mtag="item"> <span v-html="item" @click="leftTagClick($event);"></span> </el-tag> </span>
                             <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>

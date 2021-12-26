@@ -26,7 +26,7 @@ function extractFromPdfFile(filePath, ctx) {
     var titleFont = fontSizes.indexOf(Math.max.apply(Math, fontSizes))
     var title = xpath.select(`//text[@font=${titleFont}]`, doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, "")).join(' ');
     //title has two fonts
-    if(title.split(' ').map(x => x.length).filter(x => x == 1).length >= 3){
+    if(title.split(' ').map(x => x.length).filter(x => x == 1).length >= 3 || title.split(' ').length <= 3){
         var title = "";
         for(t of xpath.select(`//text[@font=${titleFont} or @font=${titleFont+1}]`, doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, ""))){
             title += t;

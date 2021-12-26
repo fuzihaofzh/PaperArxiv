@@ -165,6 +165,22 @@ var ItemEdit = {
             this.searchContent(node.path, domains = ["libraryPath"], false);
             this.clearAllLeftTags();
         },
+        handleLibraryNodeDBClick(event, data){
+            data.isEdit = true;
+            editBox = event.target.parentElement.querySelector('input')
+            setTimeout(function() {editBox.focus()}, 1);
+        },
+        handleTreeFinishEdit(data, remove = false){
+            data.isEdit = false;
+            utils.updateUserLibraryTree(ctx, data.name, data.path, remove);
+            this.treePath = utils.getUserLibraryTree(ctx.tableData);
+        },
+        handleTagsFinishEdit(oldTag, data, remove = false){
+            data.isEdit = false;
+            newTag = data.label;
+            utils.updateUserTags(ctx, oldTag, newTag, remove);
+            this.refreshAllInfo();
+        },
         handleLibraryNodeDrop(e){
             var name=e.dataTransfer.getData("text");
             var path = e.target.getAttribute("path")
@@ -189,19 +205,20 @@ var ItemEdit = {
                 alltags = document.getElementsByClassName("tag-list");
                 for (tag of alltags){
                     if(tag.getAttribute("etag").replace(/<[^>]*>?/gm, '') == tagname){
-                        tag.children[0].click();
+                        tag.children[1].click();
                         return;
                     }
                 }
+            }else if(e.target.parentElement.getAttribute("etag") !== null){
+                e.target.parentElement.classList.toggle("tag-list-toggle");
+                //e.target.parentElement.style.background = "#5A9CF8";
+                selected = document.getElementsByClassName("tag-list-toggle");
+                stags = []
+                for(span of selected){
+                    stags.push(span.getAttribute("etag").replace(/<[^>]*>?/gm, ''));
+                }
+                this.searchContent('(' + stags.join('|') + ')', ['tags'], false);
             }
-            e.target.parentElement.classList.toggle("tag-list-toggle");
-            //e.target.parentElement.style.background = "#5A9CF8";
-            selected = document.getElementsByClassName("tag-list-toggle");
-            stags = []
-            for(span of selected){
-                stags.push(span.getAttribute("etag").replace(/<[^>]*>?/gm, ''));
-            }
-            this.searchContent('(' + stags.join('|') + ')', ['tags'], false);
         },
         clearAllLeftTags(){
             selected = document.getElementsByClassName("tag-list-toggle");
@@ -253,3 +270,15 @@ window.addEventListener('resize', function (e){
     }, true);
 
 setTimeout(updateWindowSize, 1);
+
+var Split = require('split.js');
+Split(['#split-00', '#split-01'], {
+    direction: 'vertical',
+    sizes: [10, 90],
+    gutterSize: 6,
+});
+Split(['#split-0', '#split-1'], {
+    sizes: [25, 75],
+    gutterSize: 6,
+});
+

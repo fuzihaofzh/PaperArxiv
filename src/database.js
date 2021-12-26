@@ -12,7 +12,7 @@ function DBManager(ctx) {
                 return;
             }
             ctx.dbTableName = "docInfoTable";
-            db.prepare("create table if not exists " + ctx.dbTableName + "(name text NOT NULL PRIMARY KEY, title text, authors text, year text, journal text, tags text, comment text, addTime datetime, updateTime datetime, content text, libraryPath text)").run();
+            db.prepare("create table if not exists " + ctx.dbTableName + "(name text NOT NULL PRIMARY KEY, title text, authors text, year text, journal text, tags text, comment text, addTime datetime, updateTime datetime, content text, libraryPath text DEFAULT '/Library')").run();
             //ctx.metaTableName = "metaInfoTable";
             //db.prepare("create table if not exists " + ctx.metaTableName + " (name text NOT NULL PRIMARY KEY, info text)");
             this.db = db;

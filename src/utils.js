@@ -43,7 +43,13 @@
                 return o[b]-o[a];
             });
             res = {};
-            a.forEach(x => res[x] = o[x]);
+            for(aa of a){
+                res[aa] = {};
+                res[aa].count = o[aa];
+                res[aa].isEdit = false;
+                res[aa].label = aa;
+            }
+            //a.forEach(x => res[x] = o[x]);
             return res
         }
         tags = [];
@@ -78,6 +84,8 @@
             r.subitem.add(name);
             r.count = r.subitem.size;
             r.label = icons[deepth] + r.name + "(" + r.count.toString() + ")";
+            r.isEdit = false;
+            r.isTextEdit = false;
             r.path = fullPath + "/" + r.name;
             if (pathSeg.length > 1 && r.children == undefined)r.children = [];
             addNode(r.children, pathSeg.slice(1, pathSeg.length), deepth + 1, r.path, name);
@@ -97,6 +105,44 @@
         }
         return tree;
     };
+    this.updateUserLibraryTree = function (ctx, newName, oldPath, remove = false){
+        if(remove)newName = "";
+        var pathSeg = oldPath.split('/')
+        newPath = pathSeg.slice(0, pathSeg.length - 1).join('/') + '/'+ newName;
+        if(newPath == oldPath)return;
+        for (item of ctx.tableData){
+            paths = item.libraryPath.split('\n');
+            oid = paths.indexOf(oldPath);
+            while(oid != -1){
+                if(!remove){
+                    paths[oid] = newPath;
+                }else{
+                    paths = paths.filter(x => x != oldPath);
+                }
+                oid = paths.indexOf(oldPath);
+                item.libraryPath = paths.join('\n');
+                ctx.dbManager.updateItemInfoFixName(item);
+            }
+        }
+    }
+    this.updateUserTags = function (ctx, oldTag, newTag,  remove = false){
+        if(remove)newTag = "";
+        if(oldTag == newTag)return;
+        for (item of ctx.tableData){
+            tags = item.tags.split(/[,;\n]/g);
+            oid = tags.indexOf(oldTag);
+            while(oid != -1){
+                if(!remove){
+                    tags[oid] = newTag;
+                }else{
+                    tags = tags.filter(x => x != oldTag);
+                }
+                oid = tags.indexOf(oldTag);
+                item.tags = tags.join(',');
+                ctx.dbManager.updateItemInfoFixName(item);
+            }
+        }
+    }
     this.configToString = function (config){
         return JSON.stringify(config, null, '\t')
     }

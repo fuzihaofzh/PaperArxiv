@@ -15,6 +15,9 @@
 </head>
 
 <style>
+    .default-font{
+        font-family: Helvetica;
+    }
     /* Do not show the table header*/
     .el-table__header-wrapper{
         display: none !important;
@@ -44,6 +47,28 @@
     .tag-list-toggle{ background: #5A9CF8;color:white;}
     .tag-list-toggle:hover{ background: #5A9CF8;color:white;}
     
+    .split {
+        display: flex;
+        flex-direction: row;
+    }
+    .gutter {
+        background-color: #eee;
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+    .gutter.gutter-horizontal {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+        cursor: col-resize;
+    }
+    .gutter {
+        background-color: #eee;
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+    .gutter.gutter-vertical {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+        cursor: row-resize;
+    }
     
     img{
         opacity: .6;
@@ -109,37 +134,54 @@
             </div>
         </el-dialog>
 
-        <el-container style="border: 1px;" >
-            <el-aside width="200px">
-                <el-scrollbar style="position: fixed; height: 45%; width: 200px">
-                <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick" >
-                    <span class="custom-tree-node" slot-scope="{ node, data }">
-                        <div @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node">
-                        {{ node.label }}
-                        </div>
-                    </span>
-                </el-tree>
-                </el-scrollbar>
-
-                <el-scrollbar style="top:55%; height: 50%">
-                <div v-for="(value,key,index) in userTags" style="display:inline">
-                <el-tag size="mini" class="tag-list" :etag="key"> <span v-html="key + '(' + value.toString() + ')'" @click="leftTagClick($event);" ></span> </el-tag>
+        <div class="split" style="height: 100%;">
+            <div id="split-0">
+                <div id="split-00">
+                    <el-scrollbar style="height: 100%;">
+                        <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick">
+                            <span class="custom-tree-node" slot-scope="{ node, data }">
+                                <span class="tree-label" v-show="data.isEdit">
+                                    <i class="el-icon-delete" @mousedown="handleTreeFinishEdit(data, true)"></i>
+                                    <el-input size="mini" autofocus
+                                    v-model="data.name"
+                                    @blur="handleTreeFinishEdit(data)"
+                                    @keyup.enter.native="handleTreeFinishEdit(data)"></el-input>
+                                </span>
+                                <span @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node" @dblclick='handleLibraryNodeDBClick($event, data)'>
+                                {{ node.label }}
+                                </span>
+                            </span>
+                        </el-tree>
+                        </el-scrollbar>
                 </div>
-                </el-scrollbar>
-            </el-aside>
-
-            <el-main style="padding:0;margin: 0;">
+                <div id="split-01">
+                    <el-scrollbar style="height: 100%;">
+                        <div v-for="(value,key,index) in userTags" style="display:inline">
+                            <el-tag size="mini" class="tag-list" :etag="key"> 
+                                <span class="tag-label" v-show="value.isEdit">
+                                    <i class="el-icon-delete" @mousedown="handleTagsFinishEdit(key, value, true)"></i>
+                                    <el-input size="mini" autofocus
+                                    v-model="value.label"
+                                    @blur="handleTagsFinishEdit(key, value)"
+                                    @keyup.enter.native="handleTagsFinishEdit(key, value)"></el-input>
+                                </span>
+                                <span v-html="key + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag>
+                        </div>
+                        </el-scrollbar>
+                </div>
+            </div>
+            <div id="split-1">
                 <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
                     <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                         <template slot-scope="table">
-                        <big><span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)">&#x1F4C4</span>&nbsp<strong v-html="table.row.title"></strong></big>
+                        <big><span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)">&#x1F4C4</span>&nbsp<strong v-html="table.row.title" class="default-font"></strong></big>
                         <span>&nbsp &nbsp</span>
-                        <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;"></span>
+                        <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;" class="default-font"></span>
                         <br>
-                        <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#2B652A"></span>
+                        <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#2B652A" class="default-font"></span>
                         <br> 
-                        <span v-html="table.row.comment"></span>
-                        <span class="foot_tags">
+                        <span v-html="table.row.comment" class="default-font"></span>
+                        <span class="foot_tags" class="default-font">
                             <span>&#x1F3F7</span>
                             <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini" :mtag="item"> <span v-html="item" @click="leftTagClick($event);"></span> </el-tag> </span>
                             <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
@@ -154,7 +196,8 @@
                         </template>
                     </el-table-column>
                 </el-table>
-            </el-main>
+            </div>
+        </div>
     </div>
 
 

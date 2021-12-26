@@ -1,6 +1,6 @@
 {
     "name": "PaperArxiv",
-    "version": "0.0.5",
+    "version": "0.1.1",
     "description": "A paper management tool",
     "main": "main.js",
     "scripts": {
@@ -28,7 +28,7 @@
         "electron": "16.0.5",
         "electron-builder": "^19.27.2",
         "electron-installer-debian": "0.5.2",
-        "electron-packager": "9.0.0",
+        "electron-packager": "15.4.0",
         "electron-rebuild": "3.2.5",
         "electron-winstaller": "2.6.3",
         "vue-devtools": "3.1.6"
@@ -46,6 +46,7 @@
         "vue": "2.6.14",
         "xmldom": "0.1.27",
         "xpath": "0.0.24",
-        "title-case": "3.0.3"
+        "title-case": "3.0.3",
+        "split.js": "1.6.4"
     }
 }

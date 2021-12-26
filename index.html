@@ -111,7 +111,7 @@
 
         <el-container style="border: 1px;" >
             <el-aside width="200px">
-                <el-scrollbar style="position: fixed; height: 45%; width: 30%">
+                <el-scrollbar style="position: fixed; height: 45%; width: 200px">
                 <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick" >
                     <span class="custom-tree-node" slot-scope="{ node, data }">
                         <div @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node">

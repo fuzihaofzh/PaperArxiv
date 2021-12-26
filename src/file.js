@@ -1,7 +1,8 @@
 const utils = new (require('./utils.js').utils)();
 const path = require('path');
-const fs = require('fs');
+const {titleCase} = require('title-case');
 function extractFromPdfFile(filePath, ctx) {
+    console.log(`Processing${filePath}`);
     if(! filePath.endsWith('.pdf'))return null;
     var child_process = require('child_process');
     var pdfInfo = {}
@@ -11,24 +12,39 @@ function extractFromPdfFile(filePath, ctx) {
         ctx.error("Cannot find pdftohtml command in current shell. Please install popller and set the path of sh.\n" + err);
         return;
     }
-    var years = utils.regFindAll(/19\d\d|20\d\d/g, data).map(x => Number(x));
+    var years = utils.regFindAll(/19\d\d|20\d\d/g, data).map(x => Number(x)).filter(x => x <= new Date().getFullYear());
     pdfInfo.year = Math.max(...(years.length == 0 ? [(new Date()).getFullYear()] : years));
     var xpath = require('xpath'), dom = require('xmldom').DOMParser
-    var doc = new dom().parseFromString(data)
-    var title = xpath.select("//text[@font=0]", doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, "")).join(' ');//remove html tags
-    var authorsList = xpath.select("//text[@font=1 or @font=2 or @font=3 or @font=4 or @font=5]", doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, ""));
-    if([...Object.keys(ctx.configSettings.ConferenceMap), 'arXiv', 'Vol.', 'V o L', 'N A t U r e', 'RESEARCH ARTICLES', 'LETTER', 'I N V I T E D P A P E R', 'doi.org'].some(x => utils.strContain(title, x)) || title.length < 5){
-        title = xpath.select("//text[@font=1]", doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, "")).join(' ');
-        authorsList = xpath.select("//text[@font=2 or @font=3 or @font=4 or @font=5]", doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, ""));
+    meta = []
+    for(line of data.split('\n')){
+        if(['Abstract', 'abstract', 'ABSTRACT', 'BSTRACT', 'Introduction'].some(x => utils.strContain(line, x))) break;
+        meta.push(line);
     }
-    pdfInfo.title = title.slice(0, 200);
+    meta = meta.join('\n');
+    var doc = new dom().parseFromString(meta)
+    var fontSizes = xpath.select("//fontspec", doc).map(x => parseInt(x.getAttribute('size'))).slice(0, 8);
+    var titleFont = fontSizes.indexOf(Math.max.apply(Math, fontSizes))
+    var title = xpath.select(`//text[@font=${titleFont}]`, doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, "")).join(' ');
+    //title has two fonts
+    if(title.split(' ').map(x => x.length).filter(x => x == 1).length >= 3){
+        var title = "";
+        for(t of xpath.select(`//text[@font=${titleFont} or @font=${titleFont+1}]`, doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, ""))){
+            title += t;
+            if(utils.strContain(t, '-')){title = title.slice(0, title.length-1);}
+            if (t.length > 1 && !utils.strContain(t, '-')){title += ' ';}
+        }
+        title = title.toLowerCase();
+        titleFont += 1;
+    }
+    var authorsList = xpath.select(`//text[@font=${titleFont+1} or @font=${titleFont+2} or @font=${titleFont+3} or @font=${titleFont+4} or @font=${titleFont+5}]`, doc).map(x => x.toString().replace(/<\/?[^>]+(>|$)|\n/g, "")).filter(x => utils.strContain(x, ' ')).concat();
+    pdfInfo.title = titleCase(title.slice(0, 200));
     var authors = []
     var cnt = 0
     for(var i = 0; i < authorsList.length; ++i){
         var a = authorsList[i];
-        if(a !== undefined && ['Abstract', 'abstract', 'ABSTRACT', 'BSTRACT', 'Introduction'].every(x => !utils.strContain(a, x)) && authors.length < 10){
+        if(a !== undefined && ['Abstract', 'abstract', 'ABSTRACT', 'BSTRACT', 'Introduction'].every(x => !utils.strContain(a, x)) && authors.length < 20){
             if(a.length >= 4){
-                authors = authors.concat(a.replace(/†|∗|‡|§/g,'').split(/,| *and /g));
+                authors = authors.concat(a.replace(/†|∗|‡|§/g,'').split(/,| *and /g).filter(x => x.length > 2));
             }
         }else{
             break;
@@ -43,7 +59,7 @@ function extractFromPdfFile(filePath, ctx) {
             break;
         }
     }
-    pdfInfo.authors = authors.map(x => x.trim()).join('\n')
+    pdfInfo.authors = authors.map(x => titleCase(x.trim())).join('\n');
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
     pdfInfo.addTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -5).replace('T', ' ');
     pdfInfo.updateTime = pdfInfo.addTime;
@@ -76,13 +92,16 @@ function extractFromPdfFile(filePath, ctx) {
     return pdfInfo;
 }
 function loadFile(ctx) {
-    var dialog = require('electron').remote.dialog;
-    dialog.showOpenDialog({
-        defaultPath: ctx.previousOpenPath == undefined? null: ctx.previousOpenPath,
-        properties: ['openFile', 'multiSelections']
-    }, function(filePath) {
-        if(filePath === undefined)return;
-        filePath.forEach(function(entry) {
+    //fileDialog({ multiple: true, accept: 'image/*' })
+    //.then(file => {  
+    //})
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.onchange = function(e) {
+        var filePath = e.target.files[0]; 
+        for(file of e.target.files) {
+            entry = file.path;
             if (!entry.endsWith('.pdf')) {
                 console.log(ctx);
                 ctx.error(entry + '\n文件类型错误，只能打开pdf文件');
@@ -96,14 +115,16 @@ function loadFile(ctx) {
             ctx.previousOpenPath = path.dirname(entry);
             //ctx.ctor.searchContent();
             ctx.ctor.userInputSearchText = "";
-        });
-    });
+        }
+        ctx.ctor.refreshAllInfo();
+    };
+    input.click();
 }
 
 function searchTags(text, ctx){
     text = text.toLowerCase()
     tags = []
-    for(tag of ctx.ctor.userTags){
+    for(tag in ctx.ctor.userTags){
         if(utils.strContain(text, " " + tag.toLowerCase() + " ")){
             tags.push(tag);
         }

@@ -51,10 +51,7 @@ var ItemEdit = {
             }else{
                 ctx.dbManager.InsertItemInfo();
             }
-            this.searchContent(this.userInputSearchText);
-            this.userTags = utils.getUserTags(ctx.tableData);
-            this.treePath = utils.getUserLibraryTree(ctx.tableData);
-            this.$refs.searchBox.focus();
+            this.refreshAllInfo();
         },
         itemEditFormDataCancel: function(){
             this.tagsBuffer = null;
@@ -83,7 +80,13 @@ var ItemEdit = {
             };
         },
         openPdfFileWithSystemTool: function(val){
-            shell.openItem(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
+            shell.openPath(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
+        },
+        refreshAllInfo: function(){
+            this.searchContent(this.userInputSearchText);
+            this.userTags = utils.getUserTags(ctx.tableData);
+            this.treePath = utils.getUserLibraryTree(ctx.tableData);
+            this.$refs.searchBox.focus();
         },
         searchTitleInBrowser: function(val, method){
             var div = document.createElement("div");
@@ -151,8 +154,7 @@ var ItemEdit = {
             this.$confirm('Confirm to delete record ' + name.replace(/<\/?[^>]+(>|$)/g, "") + '？')
                 .then(_ => {
                   ctx.dbManager.deleteItemInfo(name.replace(/<\/?[^>]+(>|$)/g, ""));
-                  this.searchContent();
-                  this.$refs.searchBox.focus();
+                  this.refreshAllInfo();
                 })
                 .catch(_ => {})
         },
@@ -199,7 +201,7 @@ var ItemEdit = {
             for(span of selected){
                 stags.push(span.getAttribute("etag").replace(/<[^>]*>?/gm, ''));
             }
-            this.searchContent('(' + stags.join('|') + ')', ['tags'], true);
+            this.searchContent('(' + stags.join('|') + ')', ['tags'], false);
         },
         clearAllLeftTags(){
             selected = document.getElementsByClassName("tag-list-toggle");

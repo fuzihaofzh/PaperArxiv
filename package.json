@@ -37,13 +37,15 @@
         "better-sqlite3": "^7.4.5",
         "child_process": "1.0.2",
         "element-ui": "2.15.6",
+        "file-dialog": "0.0.8",
         "home-dir": "1.0.0",
-        "vue": "2.6.14",
         "katex": "0.15.1",
         "opn": "5.4.0",
         "path": "0.12.7",
         "string-similarity": "3.0.0",
+        "vue": "2.6.14",
         "xmldom": "0.1.27",
-        "xpath": "0.0.24"
+        "xpath": "0.0.24",
+        "title-case": "3.0.3"
     }
 }

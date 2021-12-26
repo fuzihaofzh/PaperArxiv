@@ -98,6 +98,7 @@ function DBManager(ctx) {
         function searchOneKeyword(candindateList, searchText){
             if (!searchText) return candindateList;
             newList = [];
+            newListRender = [];
             var regEx = new RegExp('(' + searchText + ')', "ig");
             function searchAndReplace(attrList, newRow){
                 for (let key in domains){
@@ -108,15 +109,20 @@ function DBManager(ctx) {
             for (let key in candindateList) {
                 if(domains.some(function (x){return utils.strContain(candindateList[key][x], searchText)})){
                 var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
-                newList.push(searchAndReplace(domains, newRow));
+                newList.push(candindateList[key]);
+                newListRender.push(searchAndReplace(domains, newRow));
                 }
             }
-            return newList;
+            return [newList, newListRender];
         }
+        var candindateList = ctx.tableData;
+        if (ctx.previousSearchText !== undefined && utils.strContain(searchText, ctx.previousSearchText)){
+            candindateList = ctx.previousCandindateList;
+        }
+        ctx.previousSearchText = searchText;
         searchText = searchText.trim().split(/[ ]*\+[ ]*/g);
-        candindateList = ctx.tableData;
         for (let word of searchText){
-            candindateList = searchOneKeyword(candindateList, word);
+            [ctx.previousCandindateList, candindateList] = searchOneKeyword(candindateList, word);
         }
         ctx.ctor.tableData = candindateList;
     }

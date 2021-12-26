@@ -7,6 +7,7 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
+    icon: path.join(__dirname, 'icons/pa.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -18,7 +19,7 @@ function createWindow () {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Check if we are on a MAC
 	if (process.platform === 'darwin') {

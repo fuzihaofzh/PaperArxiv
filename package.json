@@ -10,7 +10,8 @@
         "buildwin": "electron-packager .  PaperArxiv --platform=win32 --arch=x64 --out dist/ --icon=icons/pa.ico --prune=true --asar --overwrite ",
         "buildmac": "electron-packager .  PaperArxiv --platform=darwin --arch=x64 --out dist/ --icon=icons/pa.ico --asar --overwrite ",
         "deb64": "electron-installer-debian --src dist/PaperArxiv-linux-x64 --dest dist/installers/ --icon icons/pa.icns --arch amd64",
-        "win64": "node buildwin64.js"
+        "win64": "node buildwin64.js",
+        "buildall": "electron-packager .  PaperArxiv --platform=all --arch=x64,ia32 --out dist/ --icon icons/pa --asar --overwrite"
     },
     "postinstall": "./node_modules/.bin/electron-rebuild",
     "repository": "https://github.com/electron/electron-quick-start",

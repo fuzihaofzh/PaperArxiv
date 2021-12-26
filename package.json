@@ -33,6 +33,9 @@
         "electron-winstaller": "2.6.3",
         "vue-devtools": "3.1.6"
     },
+    "engines": {
+        "node": "14.18.2"
+      },
     "dependencies": {
         "better-sqlite3": "^7.4.5",
         "child_process": "1.0.2",

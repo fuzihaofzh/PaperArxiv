@@ -174,6 +174,7 @@
                 <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
                     <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                         <template slot-scope="table">
+                        <lazy-component wrapper-tag="section" root-margin="2000px 2000px 2000px 2000px" @intersected="renderWithKatex">
                         <big><span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)">&#x1F4C4</span>&nbsp<strong v-html="table.row.title" class="default-font"></strong></big>
                         <span>&nbsp &nbsp</span>
                         <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;" class="default-font"></span>
@@ -193,6 +194,7 @@
                             <span >&#x270F</span>
                             <span v-html="table.row.updateTime"></span>
                         </span>
+                        </lazy-component>
                         </template>
                     </el-table-column>
                 </el-table>

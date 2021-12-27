@@ -51,6 +51,7 @@
         "xmldom": "0.1.27",
         "xpath": "0.0.24",
         "title-case": "3.0.3",
-        "split.js": "1.6.4"
+        "split.js": "1.6.4",
+        "v-lazy-component": "2.0.0"
     }
 }

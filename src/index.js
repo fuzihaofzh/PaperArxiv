@@ -135,7 +135,6 @@ var ItemEdit = {
             }else if(searchValue.length >= 1){
                 ctx.dbManager.searchItemInfo(searchValue, domains);
             }
-            setTimeout(renderKatex, 1);
         },
         sortTableItem: function(x, y){
             return x.updateTime > y.updateTime? 1 : -1;
@@ -225,9 +224,28 @@ var ItemEdit = {
             for(var i = selected.length - 1; i >= 0; i-- ){
                 selected[i].classList.toggle("tag-list-toggle");
             }
+        },
+        renderWithKatex(element) {
+            function render(){
+                renderMathInElement(element, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                // • rendering keys, e.g.:
+                throwOnError : false
+                });
+            }
+            setTimeout(render, 10);
         }
     }
 }
+const LazyComponent = require("v-lazy-component");
+Vue.use(LazyComponent);
 var Ctor = Vue.extend(ItemEdit);
 new Ctor().$mount('#app');
 document.addEventListener('keyup', function (e){
@@ -247,23 +265,6 @@ function updateWindowSize(){
     document.getElementById('el-main-table').setAttribute("style","height:" + (height - 60).toString() + "px");
 }
 
-function renderKatex() {
-    renderMathInElement(document.body, {
-      // customised options
-      // • auto-render specific keys, e.g.:
-      delimiters: [
-          {left: '$$', right: '$$', display: true},
-          {left: '$', right: '$', display: false},
-          {left: '\\(', right: '\\)', display: false},
-          {left: '\\[', right: '\\]', display: true}
-      ],
-      // • rendering keys, e.g.:
-      throwOnError : false
-    });
-}
-
-
-document.addEventListener("DOMContentLoaded", renderKatex);
 
 window.addEventListener('resize', function (e){
       updateWindowSize();
@@ -282,3 +283,4 @@ Split(['#split-0', '#split-1'], {
     gutterSize: 6,
 });
 
+document.querySelector("title").innerText = "PaperArxiv (" + ctx.configSettings.libpath + ")";

@@ -1,4 +1,5 @@
- function utils(){
+const {icons} = require('./icons.js');
+function utils(){
      this.strContain = function (ss, sub) {
         var regEx = new RegExp(sub, "ig");
         if(ss.toString().match(regEx) != null){
@@ -62,7 +63,7 @@
     };
     this.getUserLibraryTree = function (src){
         tree = [{name : "Library"}];
-        icons = ["📦", "🗂️", "📚", "📘"];
+        iconsList = Object.values(icons); //["🗄️", "📦", "📚", "🗂️", "📘"];
         function addNode(node, pathSeg, deepth, fullPath, name){
             // addNode(tree, ["Library", "aaa", "bbb"]);
             if (pathSeg.length == 0) return;
@@ -83,7 +84,7 @@
             }
             r.subitem.add(name);
             r.count = r.subitem.size;
-            r.label = icons[deepth] + r.name + "(" + r.count.toString() + ")";
+            r.label = iconsList[Math.min(deepth, iconsList.length-1)] + r.name + "(" + r.count.toString() + ")";
             r.isEdit = false;
             r.isTextEdit = false;
             r.path = fullPath + "/" + r.name;
@@ -105,21 +106,27 @@
         }
         return tree;
     };
-    this.updateUserLibraryTree = function (ctx, newName, oldPath, remove = false){
-        if(remove)newName = "";
-        var pathSeg = oldPath.split('/')
-        newPath = pathSeg.slice(0, pathSeg.length - 1).join('/') + '/'+ newName;
+    this.updateUserLibraryTree = function (ctx, newPath, oldPath, remove = false){
+        if(remove)newPath = "";
         if(newPath == oldPath)return;
+        function findPath(paths, oldPath, strContain){
+            ids = [];
+            for(i in paths){
+                if(strContain(paths[i], oldPath)) ids.push(i);
+            }
+            return ids;
+        }
         for (item of ctx.tableData){
             paths = item.libraryPath.split('\n');
-            oid = paths.indexOf(oldPath);
-            while(oid != -1){
-                if(!remove){
-                    paths[oid] = newPath;
-                }else{
-                    paths = paths.filter(x => x != oldPath);
+            oids = findPath(paths, oldPath, this.strContain);
+            if(oids.length > 0){
+                for(oid of oids){
+                    if(!remove){
+                        paths[oid] = paths[oid].replace(oldPath, newPath).trim();
+                    }else{
+                        paths = paths.filter(x => !this.strContain(x, oldPath));
+                    }
                 }
-                oid = paths.indexOf(oldPath);
                 item.libraryPath = paths.join('\n');
                 ctx.dbManager.updateItemInfoFixName(item);
             }

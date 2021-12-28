@@ -7,8 +7,15 @@ const stringSimilarity = require('string-similarity');
 const fileManager = require('./file.js');
 const configManager = require('./config.js');
 const utils = new (require('./utils.js').utils)();
-
 var DBManager = require('./database.js').DBManager;
+
+var MarkdownIt = require('markdown-it')({
+    html:true, breaks:false,linkify:false});
+var markdownItKatex = require('@traptitech/markdown-it-katex');
+MarkdownIt.use(markdownItKatex, {"blockClass": "math-block", "errorColor" : " #cc0000"});
+
+//var markdownItMermaid = require("@wekanteam/markdown-it-mermaid");
+//import("@liradb2000/markdown-it-mermaid").then(module => { markdownItMermaid= module });
 
 var ctx = {}
 ctx.configManager = new (require('./config.js').configManager)(ctx);
@@ -135,9 +142,11 @@ var ItemEdit = {
             }else if(searchValue.length >= 1){
                 ctx.dbManager.searchItemInfo(searchValue, domains);
             }
+            //toggle main tags
+            //setTimeout(this.toggleMainTags, 1);
         },
         sortTableItem: function(x, y){
-            return x.updateTime > y.updateTime? 1 : -1;
+            return x.addTime > y.addTime? 1 : -1;
         },
         editRowInfo: function(row){
             this.tagsBuffer = null;
@@ -169,10 +178,21 @@ var ItemEdit = {
             editBox = event.target.parentElement.querySelector('input')
             setTimeout(function() {editBox.focus()}, 1);
         },
+        handleLibraryTreeNodeDrop(draggingNode, dropNode, dropType, ev) {
+            newPath = dropNode.data.path + "/" + draggingNode.data.name
+            utils.updateUserLibraryTree(ctx, newPath, draggingNode.data.path);
+            this.treePath = utils.getUserLibraryTree(ctx.tableData);
+        },
+        clearLibraryTree(){
+            this.$refs['library-tree'].setCurrentKey(null);
+        },
         handleTreeFinishEdit(data, remove = false){
             data.isEdit = false;
-            utils.updateUserLibraryTree(ctx, data.name, data.path, remove);
+            var pathSeg = data.path.split('/')
+            newPath = data.path.split('/').slice(0, pathSeg.length - 1).join('/') + '/'+ data.name;
+            utils.updateUserLibraryTree(ctx, newPath, data.path, remove);
             this.treePath = utils.getUserLibraryTree(ctx.tableData);
+            this.refreshAllInfo();
         },
         handleTagsFinishEdit(oldTag, data, remove = false){
             data.isEdit = false;
@@ -198,26 +218,29 @@ var ItemEdit = {
         handleItemIconDrag(e){
             e.dataTransfer.setData("text", e.target.getAttribute("name"));
         },
-        leftTagClick(e) {
-            if (e.target.parentElement.getAttribute("mtag") !== null){
-                var tagname = e.target.parentElement.getAttribute("mtag").replace(/<[^>]*>?/gm, '');
-                alltags = document.getElementsByClassName("tag-list");
-                for (tag of alltags){
-                    if(tag.getAttribute("etag").replace(/<[^>]*>?/gm, '') == tagname){
-                        tag.children[1].click();
-                        return;
-                    }
+        mainTagClick(e) {
+            var parent = e.target.parentElement;
+            parent = (parent.getAttribute("mtag") == null ? parent.parentElement : parent);
+            var tagname = parent.getAttribute("mtag").replace(/<[^>]*>?/gm, '');
+            alltags = document.getElementsByClassName("tag-list");
+            for (tag of alltags){
+                if(tag.getAttribute("etag").replace(/<[^>]*>?/gm, '') == tagname){
+                    tag.children[1].click();
+                    tag.children[1].scrollIntoView({block: "center", inline: "center", behavior : "smooth"});
+                    return;
                 }
-            }else if(e.target.parentElement.getAttribute("etag") !== null){
-                e.target.parentElement.classList.toggle("tag-list-toggle");
-                //e.target.parentElement.style.background = "#5A9CF8";
-                selected = document.getElementsByClassName("tag-list-toggle");
-                stags = []
-                for(span of selected){
-                    stags.push(span.getAttribute("etag").replace(/<[^>]*>?/gm, ''));
-                }
-                this.searchContent('(' + stags.join('|') + ')', ['tags'], false);
             }
+        },
+        leftTagClick(e){
+            e.target.parentElement.classList.toggle("tag-list-toggle");
+            selected = document.getElementsByClassName("tag-list-toggle");
+            stags = []
+            for(span of selected){
+                stags.push(span.getAttribute("etag").replace(/<[^>]*>?/gm, ''));
+            }
+            //search
+            this.searchContent('(' + stags.join('|') + ')', ['tags'], false);
+            this.clearLibraryTree();
         },
         clearAllLeftTags(){
             selected = document.getElementsByClassName("tag-list-toggle");
@@ -225,7 +248,16 @@ var ItemEdit = {
                 selected[i].classList.toggle("tag-list-toggle");
             }
         },
+        toggleMainTags(){
+            mainTags = document.getElementsByClassName("main-tag-list");
+            for(tag of mainTags){
+                if(tag.querySelector("font") != null){
+                    tag.classList.toggle("main-tag-list-toggle");
+                }
+            }
+        },
         renderWithKatex(element) {
+            return;// Use Markdown-it instead.
             function render(){
                 renderMathInElement(element, {
                 // customised options
@@ -240,7 +272,12 @@ var ItemEdit = {
                 throwOnError : false
                 });
             }
-            setTimeout(render, 10);
+            setTimeout(render, 100);
+        },
+        renderComments(content){
+            var result = MarkdownIt.render(content);
+            result = result.replace('<p>', '<p style="display:inline">');
+            return result;
         }
     }
 }
@@ -262,7 +299,9 @@ document.addEventListener('keydown', function (e){
 // ======= set table size
 function updateWindowSize(){
     var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    document.getElementById('el-main-table').setAttribute("style","height:" + (height - 60).toString() + "px");
+    heightpx = (height - 60).toString() + "px"
+    document.getElementById('el-main-table').setAttribute("style","height:" + heightpx);
+    document.getElementById("split-0").style.height = heightpx;
 }
 
 
@@ -275,12 +314,12 @@ setTimeout(updateWindowSize, 1);
 var Split = require('split.js');
 Split(['#split-00', '#split-01'], {
     direction: 'vertical',
-    sizes: [10, 90],
-    gutterSize: 6,
+    sizes: [40, 60],
+    gutterSize: 2,
 });
 Split(['#split-0', '#split-1'], {
-    sizes: [25, 75],
-    gutterSize: 6,
+    sizes: [20, 80],
+    gutterSize: 2,
 });
 
 document.querySelector("title").innerText = "PaperArxiv (" + ctx.configSettings.libpath + ")";

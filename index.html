@@ -23,36 +23,39 @@
         display: none !important;
     }
     td {background-color: #fdf6e3 ;font-size:120%}
-    td:hover {background-color: #F5F0E1 !important;}
+    td:hover {background-color: #f9f2df !important;}
     .el-input__inner:{background-color: #fdf6e3 !important}
     #el-input-search {background-color: #fdf6e3 !important;}
     #el-input-search:focus {background-color: #fdf6e3;}
     #el-main-table {background-color: #fdf6e3;}
+    .my-el-button{background-color:#fdf6e3 !important; margin-top: 1px;}
+    .my-el-button:hover{background-color:#EAE0C0 !important;border-color: #DDDFE5 !important;color: #606266 !important; }
     .foot_tags { float:right; }
     .el-tree{
-        background: rgba(0,0,0,0);
+        background: rgba(0,0,0,0) !important;
         min-width: 100%;
         display: inline-block !important;
     }
-
+    .el-tree-node__content {
+        background-color: #fdf6e3 !important;
+    }
     .el-tree-node.is-current > .el-tree-node__content {
-        background-color: #ebe3cc !important;
+        background-color: #DECB88 !important;
     }
-    .el-tree-node__content:active {background-color: #ebe3cc !important;
+    .el-tree-node__content:hover {background-color: #EAE0C0 !important;
     }
-    .el-tree-node__content:hover {background-color: #f9f2df !important;
-    }
-    .tag-list{ background: rgba(0,0,0,0);}
-    .tag-list:hover{cursor: pointer; background-color: #EEF5FE}
-    .tag-list-toggle{ background: #5A9CF8;color:white;}
-    .tag-list-toggle:hover{ background: #5A9CF8;color:white;}
+    
+    .main-tag-list, .tag-list{ background: #fdf6e3;border: 0px;color: #586e75;}
+    .main-tag-list:hover{cursor: default; background-color: #EAE0C0}
+    .tag-list:hover{cursor: pointer; background-color: #EAE0C0}
+    .tag-list-toggle, .tag-list-toggle:hover, .main-tag-list-toggle, .main-tag-list-toggle:hover{ background: #DECB88;}
     
     .split {
         display: flex;
         flex-direction: row;
     }
     .gutter {
-        background-color: #eee;
+        background-color: #eee8d5;
         background-repeat: no-repeat;
         background-position: 50%;
     }
@@ -60,32 +63,37 @@
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
         cursor: col-resize;
     }
-    .gutter {
-        background-color: #eee;
-        background-repeat: no-repeat;
-        background-position: 50%;
-    }
     .gutter.gutter-vertical {
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
         cursor: row-resize;
     }
-    
     img{
         opacity: .6;
         cursor:pointer;
         width: 1em;
     }
+    .grabbable {
+    cursor: move; 
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    }
+    .grabbable:active {
+        cursor: grabbing;
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+    }
 </style>
 
 <body style="overflow-y:hidden" bgcolor="#fdf6e3">
     <div id="app">
-        <div style="float:right; width:210px; margin-bottom: 8px;">
-            <el-button icon="el-icon-plus" @click="openPdfFile">Add</el-button>
-            <el-button icon="el-icon-setting" @click="itemConfigFormVisible = true">Config</el-button>
+        <div style="float:right; width:128px; margin-bottom: 8px;">
+            <el-button icon="el-icon-plus" @click="openPdfFile" class="my-el-button" plain><!--Add--></el-button>
+            <el-button icon="el-icon-setting" @click="itemConfigFormVisible = true" class="my-el-button" plain><!--Config--></el-button>
         </div>
-        <div style="margin-right: 220px;margin-bottom: 8px;">
-            <el-input id="el-input-search" placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus v-on:input="searchContent" style="width:100%" ref="searchBox">
-                <el-button slot="append" icon="el-icon-search" @click="searchContent"></el-button>
+        <div style="margin-right: 138px;margin-bottom: 8px;">
+            <el-input id="el-input-search" placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus v-on:input="searchContent" style="width:100%; margin-top: 1px;" ref="searchBox">
+                <el-button slot="append" icon="el-icon-search" @click="searchContent" class="my-el-button"></el-button>
                 <el-button id="el-input-clear-search" slot="append" style="display:none" @click="searchContent('')"></el-button>
             </el-input>
         </div>
@@ -134,11 +142,11 @@
             </div>
         </el-dialog>
 
-        <div class="split" style="height: 100%;">
+        <div class="split" style="height: 100%; border-style: solid;border-width: 2px; border-color: #eee8d5; border-bottom: none;">
             <div id="split-0">
                 <div id="split-00">
                     <el-scrollbar style="height: 100%;">
-                        <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick">
+                        <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick" node-key="node.path" ref="library-tree" draggable @node-drop="handleLibraryTreeNodeDrop">
                             <span class="custom-tree-node" slot-scope="{ node, data }">
                                 <span class="tree-label" v-show="data.isEdit">
                                     <i class="el-icon-delete" @mousedown="handleTreeFinishEdit(data, true)"></i>
@@ -147,8 +155,7 @@
                                     @blur="handleTreeFinishEdit(data)"
                                     @keyup.enter.native="handleTreeFinishEdit(data)"></el-input>
                                 </span>
-                                <span @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node" @dblclick='handleLibraryNodeDBClick($event, data)'>
-                                {{ node.label }}
+                                <span @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node" @dblclick='handleLibraryNodeDBClick($event, data)' v-html='node.label'>
                                 </span>
                             </span>
                         </el-tree>
@@ -165,34 +172,34 @@
                                     @blur="handleTagsFinishEdit(key, value)"
                                     @keyup.enter.native="handleTagsFinishEdit(key, value)"></el-input>
                                 </span>
-                                <span v-html="key + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag>
+                                <span v-html="key + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag><small>&nbsp;</small>
                         </div>
                         </el-scrollbar>
                 </div>
             </div>
             <div id="split-1">
-                <el-table id="el-main-table" :data="tableData"  border height="100%" style=" width: 100%" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
+                <el-table id="el-main-table" :data="tableData"  height="100%" style=" width: 100%;" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
                     <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                         <template slot-scope="table">
                         <lazy-component wrapper-tag="section" root-margin="2000px 2000px 2000px 2000px" @intersected="renderWithKatex">
-                        <big><span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)">&#x1F4C4</span>&nbsp<strong v-html="table.row.title" class="default-font"></strong></big>
+                        <span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)" class = "grabbable">&#x1F4C4</span>&nbsp<span v-html="table.row.title" class="default-font" style="color: #073642; font-weight: bold; font-size: large;"></span>
                         <span>&nbsp &nbsp</span>
-                        <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#72ACE3; cursor:pointer;" class="default-font"></span>
+                        <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#268bd2; cursor:pointer;" class="default-font"></span>
                         <br>
-                        <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#2B652A" class="default-font"></span>
+                        <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#859900" class="default-font"></span>
                         <br> 
-                        <span v-html="table.row.comment" class="default-font"></span>
+                        <span v-html="renderComments(table.row.comment)" class="default-font"></span>
                         <span class="foot_tags" class="default-font">
-                            <span>&#x1F3F7</span>
-                            <span> <el-tag v-for="item in table.row.tags.split(',')" v-if="item.length !== 0" size="mini" :mtag="item"> <span v-html="item" @click="leftTagClick($event);"></span> </el-tag> </span>
+                            <span><i class="el-icon-price-tag"></i></span>
+                            <span v-for="item in table.row.tags.split(',')" v-if="item.length !== 0"> <el-tag  size="mini" :mtag="item.trim()" class="main-tag-list"> <span v-html="item" @click="mainTagClick($event);"></span> </el-tag> <small>&nbsp;</small> </span>
                             <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="search_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
-                            <span>&#x1F4C5</span>
-                            <span v-html="table.row.addTime"></span>
+                            <span><i class="el-icon-date"></i></span>
+                            <span v-html="table.row.addTime.slice" style="color: #93a1a1;font-size: small;"></span>
                             <span >&#x270F</span>
-                            <span v-html="table.row.updateTime"></span>
+                            <span v-html="table.row.updateTime" style="color: #93a1a1;font-size: small;"></span>
                         </span>
                         </lazy-component>
                         </template>

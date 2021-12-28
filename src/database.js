@@ -116,7 +116,7 @@ function DBManager(ctx) {
             return [newList, newListRender];
         }
         var candindateList = ctx.tableData;
-        if (ctx.previousSearchText !== undefined && utils.strContain(searchText, ctx.previousSearchText)){
+        if (ctx.previousSearchText !== undefined && searchText.includes(ctx.previousSearchText)){
             candindateList = ctx.previousCandindateList;
         }
         ctx.previousSearchText = searchText;

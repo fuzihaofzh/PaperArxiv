@@ -197,7 +197,7 @@
                             <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="search_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
                             <span><i class="el-icon-date"></i></span>
-                            <span v-html="table.row.addTime.slice" style="color: #93a1a1;font-size: small;"></span>
+                            <span v-html="table.row.addTime" style="color: #93a1a1;font-size: small;"></span>
                             <span >&#x270F</span>
                             <span v-html="table.row.updateTime" style="color: #93a1a1;font-size: small;"></span>
                         </span>

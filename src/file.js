@@ -9,7 +9,7 @@ function extractFromPdfFile(filePath, ctx) {
     try{
         var data = child_process.execSync('pdftohtml -f 1 -l 1 -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString();
     }catch(err){
-        ctx.error("Cannot find pdftohtml command in current shell. Please install popller and set the path of sh.\n" + err);
+        ctx.error("Cannot find pdftohtml command in current shell. Please install popller and set the PATH for sh.\n" + err);
         return;
     }
     var years = utils.regFindAll(/19\d\d|20\d\d/g, data).map(x => Number(x)).filter(x => x <= new Date().getFullYear());

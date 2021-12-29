@@ -21,7 +21,7 @@ PaperArxiv is a new paper management tool that help to organise your mind. It fo
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/1419566/147577471-e6e38a35-81ed-47f7-ab39-69fcc617e0bc.png" width="800">
+  <img src="https://user-images.githubusercontent.com/1419566/147625421-e12cd894-8b24-45e4-b62c-74272c9e05d1.png" width="800">
 </p>
 
 ## Download

@@ -172,7 +172,7 @@
                                     @blur="handleTagsFinishEdit(key, value)"
                                     @keyup.enter.native="handleTagsFinishEdit(key, value)"></el-input>
                                 </span>
-                                <span v-html="key + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag><small>&nbsp;</small>
+                                <span v-html="key + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag><small>&#8239;</small>
                         </div>
                         </el-scrollbar>
                 </div>
@@ -181,7 +181,7 @@
                 <el-table id="el-main-table" :data="tableData"  height="100%" style=" width: 100%;" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
                     <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
                         <template slot-scope="table">
-                        <lazy-component wrapper-tag="section" root-margin="2000px 2000px 2000px 2000px" @intersected="renderWithKatex">
+                        <lazy-component wrapper-tag="section" root-margin="2000px 2000px 2000px 2000px">
                         <span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)" class = "grabbable">&#x1F4C4</span>&nbsp<span v-html="table.row.title" class="default-font" style="color: #073642; font-weight: bold; font-size: large;"></span>
                         <span>&nbsp &nbsp</span>
                         <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#268bd2; cursor:pointer;" class="default-font"></span>
@@ -191,7 +191,7 @@
                         <span v-html="renderComments(table.row.comment)" class="default-font"></span>
                         <span class="foot_tags" class="default-font">
                             <span><i class="el-icon-price-tag"></i></span>
-                            <span v-for="item in table.row.tags.split(',')" v-if="item.length !== 0"> <el-tag  size="mini" :mtag="item.trim()" class="main-tag-list"> <span v-html="item" @click="mainTagClick($event);"></span> </el-tag> <small>&nbsp;</small> </span>
+                            <span v-for="item in table.row.tags.split(',')" v-if="item.length !== 0"> <el-tag  size="mini" :mtag="item.trim()" class="main-tag-list"> <span v-html="item" @click="mainTagClick($event);"></span> </el-tag> <small>&#8239;</small> </span>
                             <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
                             <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>

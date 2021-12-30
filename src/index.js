@@ -12,6 +12,8 @@ var DBManager = require('./database.js').DBManager;
 var MarkdownIt = require('markdown-it')({
     html:true, breaks:false,linkify:false});
 var markdownItKatex = require('@traptitech/markdown-it-katex');
+//var MarkdownItMermaid = require('@liradb2000/markdown-it-mermaid');
+//import MarkdownItKatex from '@liradb2000/markdown-it-mermaid';
 MarkdownIt.use(markdownItKatex, {"blockClass": "math-block", "errorColor" : " #cc0000"});
 
 //var markdownItMermaid = require("@wekanteam/markdown-it-mermaid");
@@ -274,6 +276,16 @@ var ItemEdit = {
             }
             setTimeout(render, 100);
         },
+        renderWithMume(element) {
+            function updateComment(){
+                commentElement = element.getElementsByClassName("span-of-comment")[0];
+                p1 = utils.mumeRender(commentElement.innerHTML);
+                p1.then(function(x){
+                commentElement.innerHTML = x.html;
+            });
+            }
+            setTimeout(updateComment, 1000);
+        },
         renderComments(content){
             var result = MarkdownIt.render(content);
             result = result.replace('<p>', '<p style="display:inline">');
@@ -323,3 +335,11 @@ Split(['#split-0', '#split-1'], {
 });
 
 document.querySelector("title").innerText = "PaperArxiv (" + ctx.configSettings.libpath + ")";
+
+async function updateComments(){
+    comments = document.getElementsByClassName("span-of-comment");
+    for(comment of comments){
+        res = await utils.mumeRender(comment.innerHTML);
+        comment.innerHTML = res.html;
+    }
+}

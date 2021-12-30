@@ -1,4 +1,5 @@
 const {icons} = require('./icons.js');
+const mume = require("@shd101wyy/mume");
 function utils(){
      this.strContain = function (ss, sub) {
         var regEx = new RegExp(sub, "ig");
@@ -161,6 +162,29 @@ function utils(){
             return -1;
         }
         return sc;
+    },
+    this.mumeRender = function(inputString){
+        if(this.mumeEngine == undefined){
+            this.mumeEngine = new mume.MarkdownEngine({
+                filePath: "",
+                config: {
+                  previewTheme: "github-light.css",
+                  // revealjsTheme: "white.css"
+                  codeBlockTheme: "default.css",
+                  printBackground: true,
+                  enableScriptExecution: true, // <= for running code chunks
+                },
+              });
+        }
+        if (!inputString)inputString = " "
+        html = this.mumeEngine.parseMD(inputString, {
+            useRelativeFilePath: true,
+            hideFrontMatter: true,
+            isForPreview: false,
+            runAllCodeChunks: false,
+          });
+        //html.then(x => console.log(x.html))
+        return html;
     }
 }
 module.exports = {

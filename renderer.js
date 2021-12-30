@@ -4,3 +4,9 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+
+// The esm is used for using import
+// ref: https://www.geeksforgeeks.org/how-to-use-an-es6-import-in-node-js/
+//require = require("esm")(module);
+//module.exports = require("./src/index.js");
+require("./src/index.js");

@@ -102,7 +102,7 @@ function DBManager(ctx) {
             var regEx = new RegExp('(' + searchText + ')', "ig");
             function searchAndReplace(attrList, newRow){
                 for (let key in domains){
-                    newRow[attrList[key]] = newRow[attrList[key]].toString().replace(regEx, '<font color="red">$1</font>');
+                    newRow[attrList[key]] = newRow[attrList[key]].toString().replace(regEx, '<span class="search-result-block">$1</span>');
                 }
                 return newRow;
             }

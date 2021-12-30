@@ -12,6 +12,7 @@
     <script defer src="node_modules/katex/dist/contrib/auto-render.min.js"></script>
     <script src="node_modules/vue/dist/vue.js"></script>
     <script src="node_modules/element-ui/lib/index.js"></script>
+    <script src="node_modules/mermaid/dist/mermaid.min.js"></script>
 </head>
 
 <style>
@@ -22,6 +23,7 @@
     .el-table__header-wrapper{
         display: none !important;
     }
+    .search-result-block{color: #dc322f !important;}
     td {background-color: #fdf6e3 ;font-size:120%}
     td:hover {background-color: #f9f2df !important;}
     .el-input__inner:{background-color: #fdf6e3 !important}
@@ -49,7 +51,7 @@
     .main-tag-list:hover{cursor: default; background-color: #EAE0C0}
     .tag-list:hover{cursor: pointer; background-color: #EAE0C0}
     .tag-list-toggle, .tag-list-toggle:hover, .main-tag-list-toggle, .main-tag-list-toggle:hover{ background: #DECB88;}
-    
+
     .split {
         display: flex;
         flex-direction: row;
@@ -214,7 +216,7 @@
 
 </body>
 <script>
-    require('./src/index.js');
+    require('./renderer.js');
 </script>
 
 </html>

@@ -3,6 +3,7 @@
     "version": "0.1.1",
     "description": "A paper management tool",
     "main": "main.js",
+    "type": "commonjs",
     "scripts": {
         "start": "electron .",
         "test": "ava",
@@ -38,9 +39,12 @@
         "node": "14.18.2"
     },
     "dependencies": {
+        "@babel/register": "^7.16.5",
+        "@ispicyfish/markdown-it-mermaid": "^0.1.1",
         "@liradb2000/markdown-it-mermaid": "^0.4.4",
         "@shd101wyy/mume": "^0.6.9",
         "@traptitech/markdown-it-katex": "^3.5.0",
+        "@wekanteam/markdown-it-mermaid": "^0.5.1",
         "better-sqlite3": "^7.4.5",
         "child_process": "1.0.2",
         "element-ui": "2.15.6",
@@ -49,6 +53,7 @@
         "home-dir": "1.0.0",
         "katex": "0.15.1",
         "markdown-it": "^12.3.0",
+        "mermaid-it": "^0.5.2",
         "node-poppler": "^5.1.1",
         "opn": "5.4.0",
         "path": "0.12.7",

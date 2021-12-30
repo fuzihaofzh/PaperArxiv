@@ -10,14 +10,9 @@ const utils = new (require('./utils.js').utils)();
 var DBManager = require('./database.js').DBManager;
 
 var MarkdownIt = require('markdown-it')({
-    html:true, breaks:false,linkify:false});
+    html:true, breaks:false,linkify:false,langPrefix:""});
 var markdownItKatex = require('@traptitech/markdown-it-katex');
-//var MarkdownItMermaid = require('@liradb2000/markdown-it-mermaid');
-//import MarkdownItKatex from '@liradb2000/markdown-it-mermaid';
 MarkdownIt.use(markdownItKatex, {"blockClass": "math-block", "errorColor" : " #cc0000"});
-
-//var markdownItMermaid = require("@wekanteam/markdown-it-mermaid");
-//import("@liradb2000/markdown-it-mermaid").then(module => { markdownItMermaid= module });
 
 var ctx = {}
 ctx.configManager = new (require('./config.js').configManager)(ctx);
@@ -287,9 +282,31 @@ var ItemEdit = {
             setTimeout(updateComment, 1000);
         },
         renderComments(content){
+            if (!content) return content;
+            var div = document.createElement('div');
             var result = MarkdownIt.render(content);
-            result = result.replace('<p>', '<p style="display:inline">');
-            return result;
+            div.innerHTML = result;
+            mermaids = div.querySelectorAll('code.mermaid');
+            for(mmd of mermaids){
+                //avoid search insert font cause error
+                var mmd1 = document.createElement('div');
+                mmd1.innerHTML = mmd.innerText;
+                for(sfs of mmd1.querySelectorAll(".search-result-block")){
+                    sfs.innerHTML = sfs.innerText;
+                };
+                for(i in [1,2,3,4]){// fails sometime. Retry will be OK. Seems mermaid's bug?
+                    try{
+                        html = mermaid.render("preparedScheme", mmd1.innerText);
+                        mmd.innerHTML = html;
+                        if(mmd.querySelectorAll("g").length <= 1)continue;// Sometime mermaid will generate empty graph. Skip it.
+                        break;
+                    }catch(err){
+                        console.log(err);
+                        //setTimeout(x => console.log(err), 500)
+                    }
+                }
+            }
+            return div.innerHTML; 
         }
     }
 }

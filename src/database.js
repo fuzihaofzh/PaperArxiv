@@ -72,7 +72,7 @@ function DBManager(ctx) {
         ctx.itemEditFormDataStandard = utils.deepcopy(ctx.ctor.itemEditFormData);
         var findItemId = 0;
         for(;findItemId < ctx.tableData.length && ctx.tableData[findItemId].name !== oriName; ++findItemId);
-        if(findItemId >= ctx.tableData.length){ctx.error('数据库中找不到该文件，请重启程序！');return;};
+        if(findItemId >= ctx.tableData.length){ctx.error('Cannot find the file in the database. Please restart PaperArxiv.');return;};
         for(var x in ctx.itemEditFormDataStandard){
             ctx.tableData[findItemId][x] = ctx.itemEditFormDataStandard[x];
         }
@@ -87,7 +87,7 @@ function DBManager(ctx) {
     this.deleteItemInfo = function(name){
         _deleteItem(name);
         fs.unlink(path.join(ctx.configSettings.libpath, name), function (err) {
-            if (err) ctx.warn("文件" + path.join(ctx.configSettings.libpath, name) + "无法删除，请关闭后手动删除文件");
+            if (err) ctx.warn("The file " + path.join(ctx.configSettings.libpath, name) + " cannot be deleted. Please consider closing PaperArxiv and removing the file manually.");
         });
         var findItemId = 0;
         for(;findItemId < ctx.tableData.length && ctx.tableData[findItemId].name !== name; ++findItemId);

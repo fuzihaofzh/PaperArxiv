@@ -169,6 +169,7 @@ var ItemEdit = {
         handleLibraryNodeClick(node) {
             this.searchContent(node.path, domains = ["libraryPath"], false);
             this.clearAllLeftTags();
+            document.getElementById("el-input-search").value = "";
         },
         handleLibraryNodeDBClick(event, data){
             data.isEdit = true;
@@ -229,6 +230,7 @@ var ItemEdit = {
             }
         },
         leftTagClick(e){
+            //this.clearAllLeftTags();
             e.target.parentElement.classList.toggle("tag-list-toggle");
             selected = document.getElementsByClassName("tag-list-toggle");
             stags = []
@@ -238,6 +240,7 @@ var ItemEdit = {
             //search
             this.searchContent('(' + stags.join('|') + ')', ['tags'], false);
             this.clearLibraryTree();
+            document.getElementById("el-input-search").value = "";
         },
         clearAllLeftTags(){
             selected = document.getElementsByClassName("tag-list-toggle");
@@ -286,6 +289,9 @@ var ItemEdit = {
             var div = document.createElement('div');
             var result = MarkdownIt.render(content);
             div.innerHTML = result;
+            div.firstChild.style['display']  = 'inline';
+            div.firstChild.style['margin']  = 0;
+            div.firstChild.style['padding']  = 0;
             mermaids = div.querySelectorAll('code.mermaid');
             for(mmd of mermaids){
                 //avoid search insert font cause error
@@ -302,7 +308,6 @@ var ItemEdit = {
                         break;
                     }catch(err){
                         console.log(err);
-                        //setTimeout(x => console.log(err), 500)
                     }
                 }
             }
@@ -352,6 +357,7 @@ Split(['#split-0', '#split-1'], {
 });
 
 document.querySelector("title").innerText = "PaperArxiv (" + ctx.configSettings.libpath + ")";
+setTimeout(function(){ctx.ctor.searchContent("")}, 2000);// Without this, the main cannot scroll. It is also caused by Mermaid.
 
 async function updateComments(){
     comments = document.getElementsByClassName("span-of-comment");

@@ -57,7 +57,7 @@
         "title-case": "3.0.3",
         "v-lazy-component": "2.0.0",
         "vue": "2.6.14",
-        "xmldom": "0.1.27",
+        "xmldom": "0.6.0",
         "xpath": "0.0.24"
     }
 }

@@ -25,18 +25,19 @@ PaperArxiv is a new paper management tool that helps to organize your mind. It f
 ## Notes Format
 The notes support Markdown, Latex, and Mermaid. For example, you can write the following notes to write items, formulas, and diagrams.
 ```
-- Give a proof of the *repetition problem* for Generation;
-- New **encoding method**;
-- The <font color=orange>upper bound</font> for the <del>repetition</del>:
-$$\begin{aligned}
-R\le\frac{\|B^2\|_*}{\min_{1\le i \le n} \{ \frac{1}{2}( \zeta n - \underbrace{\sum_{j=1}^n (B^2)_{ij}}_{outflow})+\frac{1}{2}(\zeta n - \underbrace{\sum_{k=1}^n (B^2)_{ki}}_{inflow}) \}}
-\end{aligned}$$
+    - Give a proof of the *repetition problem* for Generation;
+    - New **encoding method**;
+    - The <font color=orange>upper bound</font> for the <del>repetition</del>:
+    $$\begin{aligned}
+    R\le\frac{\|B^2\|_*}{\min_{1\le i \le n} \{ \frac{1}{2}( \zeta n - \underbrace{\sum_{j=1}^n (B^2)_{ij}}_{outflow})+\frac{1}{2}(\zeta n - \underbrace{\sum_{k=1}^n (B^2)_{ki}}_{inflow}) \}}
+    \end{aligned}$$
 
-```mermaid
-flowchart LR;
-Repetition-->Theory;
-Theory-->Encoding;
-```
+    ```mermaid
+    flowchart LR;
+    Repetition-->Theory;
+    Theory-->Encoding;
+    ```
+
 ```
 
 

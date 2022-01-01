@@ -19,8 +19,8 @@ PaperArxiv is a new paper management tool that helps to organize your mind. It f
 1. [Download](https://github.com/fuzihaofzh/PaperArxiv/releases) PaperArxiv;
 2. Unzip the file and put the app into your Application folder;
 3. Install [Poppler](https://poppler.freedesktop.org/). 
-  - On Mac, you can use `brew install poppler`.
-  - On Windows and Linux, please use `conda install -c conda-forge poppler`.
+    - On Mac, you can use `brew install poppler`.
+    - On Windows and Linux, please use `conda install -c conda-forge poppler`.
 4. Open PaperArxiv;
 5. Click the `Add` Button to select a paper in pdf format. PaperArxiv will automatically generate a new item for the paper;
 6. Double Click the item to add some notes;

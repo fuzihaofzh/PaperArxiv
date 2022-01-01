@@ -329,7 +329,14 @@ document.addEventListener('keydown', function (e){
         document.getElementById("el-input-clear-search").click();
         document.getElementById("el-input-search").focus();
         ctx.ctor.clearAllLeftTags();
-    }}, false);
+    }if (e.keyCode == 83 && e.metaKey) {
+        if(ctx.ctor.itemConfigFormVisible){
+            ctx.ctor.itemConfigFormDataUpdate();
+        }else if(ctx.ctor.itemEditFormVisible){
+            ctx.ctor.itemEditFormDataUpdate();
+        }
+    }
+}, false);
 // ======= set table size
 function updateWindowSize(){
     var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;

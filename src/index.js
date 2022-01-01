@@ -357,7 +357,7 @@ Split(['#split-0', '#split-1'], {
 });
 
 document.querySelector("title").innerText = "PaperArxiv (" + ctx.configSettings.libpath + ")";
-setTimeout(function(){ctx.ctor.searchContent("")}, 2000);// Without this, the main cannot scroll. It is also caused by Mermaid.
+setTimeout(function(){ctx.ctor.searchContent("")}, 2000);// Without this, the main cannot scroll. It is caused by the lazy-component.
 
 async function updateComments(){
     comments = document.getElementsByClassName("span-of-comment");

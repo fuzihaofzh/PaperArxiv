@@ -11,7 +11,7 @@
         "buildwin": "electron-packager .  PaperArxiv --platform=win32 --arch=x64 --out dist/ --icon=icons/pa.ico --prune=true --asar --overwrite ",
         "buildmac": "electron-packager .  PaperArxiv --platform=darwin --arch=x64 --out dist/ --icon=icons/pa.ico --asar --overwrite ",
         "deb64": "electron-installer-debian --src dist/PaperArxiv-linux-x64 --dest dist/installers/ --icon icons/pa.icns --arch amd64",
-        "win64": "node buildwin64.js",
+        "setupwin": "electron-installer-windows --src dist/PaperArxiv-win32-x64 --dest dist/installers/",
         "buildall": "electron-packager .  PaperArxiv --platform=all --arch=x64,ia32 --out dist/ --icon icons/pa --asar --overwrite"
     },
     "postinstall": "./node_modules/.bin/electron-rebuild",
@@ -29,10 +29,10 @@
         "ava": "0.22.0",
         "electron": "16.0.5",
         "electron-builder": "^19.27.2",
+        "electron-installer-windows": "^3.0.0",
         "electron-installer-debian": "3.1.0",
         "electron-packager": "15.4.0",
         "electron-rebuild": "3.2.5",
-        "electron-winstaller": "2.6.3",
         "vue-devtools": "3.1.6"
     },
     "engines": {

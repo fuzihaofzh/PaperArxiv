@@ -94,7 +94,7 @@ function DBManager(ctx) {
         ctx.tableData.splice(findItemId, 1);
         ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
     },
-    this.searchItemInfo = function(searchText, domains = ctx.showKeys){
+    this.searchItemInfo = function(searchText, domains = ctx.searchKeys){
         function searchOneKeyword(candindateList, searchText){
             if (!searchText) return candindateList;
             newList = [];

@@ -20,6 +20,7 @@ ctx.dbManager = new DBManager(ctx);
 ctx.dbManager.loadFullData();
 
 ctx.showKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'addTime','updateTime', 'libraryPath'];
+ctx.searchKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'addTime','updateTime'];
 var emptyData = {}
 ctx.showKeys.forEach(x => emptyData[x] = "");
 var ItemEdit = {
@@ -132,7 +133,7 @@ var ItemEdit = {
             this.tagsBuffer = this.tagsBuffer + (this.tagsBuffer.length > 0 && this.tagsBuffer[this.tagsBuffer.length - 1].trim() != ','  ? ',' : '') + item.value;
             this.itemEditFormData.tags = this.tagsBuffer;
         },
-        searchContent: function(searchValue, domains = ctx.showKeys, updateSearchBox = true){
+        searchContent: function(searchValue, domains = ctx.searchKeys, updateSearchBox = true){
             if(typeof (searchValue) === 'string' && updateSearchBox)this.userInputSearchText = searchValue;
             if(searchValue.length == 0){
                 ctx.ctor.tableData = utils.partialCopyArray(ctx.tableData, ctx.showKeys);

@@ -292,14 +292,15 @@ var ItemEdit = {
             div.firstChild.style['display']  = 'inline';
             div.firstChild.style['margin']  = 0;
             div.firstChild.style['padding']  = 0;
+            this.renderMermaid(div);
+            return div.innerHTML; 
+        },
+        renderMermaid(div){
             mermaids = div.querySelectorAll('code.mermaid');
             for(mmd of mermaids){
                 //avoid search insert font cause error
                 var mmd1 = document.createElement('div');
                 mmd1.innerHTML = mmd.innerText;
-                for(sfs of mmd1.querySelectorAll(".search-result-block")){
-                    sfs.innerHTML = sfs.innerText;
-                };
                 for(i in [1,2,3,4]){// fails sometime. Retry will be OK. Seems mermaid's bug?
                     try{
                         html = mermaid.render("preparedScheme", mmd1.innerText);
@@ -311,7 +312,22 @@ var ItemEdit = {
                     }
                 }
             }
-            return div.innerHTML; 
+        },
+        handleNotesPaste(e){
+            utils.retrieveImageFromClipboardAsBase64(e, function(imageDataBase64){
+                // If there's an image, open it in the browser as a new window :)
+                if(imageDataBase64){
+                    // data:image/png;base64,iVBORw0KGgoAAAAN......
+                    newid = Math.max(...(e.target.value.match(/(?<=image-)\d+/g)||['0']).map(x => parseInt(x))) + 1;
+                    insertStr = `![My Image][image-${newid}]`;
+                    imageData = `\n[image-${newid}]:${imageDataBase64}\n`;
+                    sepStr = "<!--The image data is attached as follows-->";
+                    if (!e.target.value.includes(sepStr))imageData = `\n\n\n\n${sepStr}\n[image-${newid}]:${imageDataBase64}`;
+                    e.target.value = e.target.value.slice(0, e.target.selectionStart) + insertStr + e.target.value.slice(e.target.selectionEnd, e.target.value.length);
+                    e.target.value += imageData;
+                    e.target.dispatchEvent(new Event("input"));
+                }
+            });
         }
     }
 }

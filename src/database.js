@@ -100,14 +100,32 @@ function DBManager(ctx) {
             newList = [];
             newListRender = [];
             var regEx = new RegExp('(' + searchText + ')', "ig");
+            var regSkip = new RegExp(/```mermaid[^```]+```|\$\$[^$]+\$\$|\n.+data:image\/png;base64.+|\!\[[^\]]+\]\[[^\]]+\]/g);
             function searchAndReplace(attrList, newRow){
                 for (let key in domains){
-                    newRow[attrList[key]] = newRow[attrList[key]].toString().replace(regEx, '<span class="search-result-block">$1</span>');
+                    if (domains[key] == "comment"){
+                        newRow[attrList[key]] = replaceOutOfBlocks(newRow[attrList[key]].toString());
+                    }else{
+                        newRow[attrList[key]] = newRow[attrList[key]].toString().replace(regEx, '<span class="search-result-block">$1</span>');
+                    }
                 }
                 return newRow;
             }
+            function replaceOutOfBlocks(str){
+                nosearch = str.match(regSkip);
+                needsearch = str.split(regSkip);
+                var res = '';
+                for(i in needsearch){
+                    if(needsearch[i] == undefined){
+                        a = 1
+                    }
+                    res += needsearch[i].replace(regEx, '<span class="search-result-block">$1</span>');
+                    if(nosearch && i < nosearch.length)res += nosearch[i];
+                }
+                return res;
+            }
             for (let key in candindateList) {
-                if(domains.some(function (x){return utils.strContain(candindateList[key][x], searchText)})){
+                if(domains.some(function (x){return utils.strContain(candindateList[key][x].replace(regSkip, ""), searchText)})){
                 var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
                 newList.push(candindateList[key]);
                 newListRender.push(searchAndReplace(domains, newRow));

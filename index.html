@@ -69,11 +69,12 @@
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
         cursor: row-resize;
     }
-    img{
+    img.img_icons{
         opacity: .6;
         cursor:pointer;
         width: 1em;
     }
+    span.default-font img{max-width: 90%;display: inline; margin: 0px; padding: 0px;}
     .grabbable {
     cursor: move; 
     cursor: grab;
@@ -132,8 +133,8 @@
                 </el-form-item>
                 <el-form-item label="Library Path">
                     <el-input v-model="itemEditFormData.libraryPath" type="textarea" autosize auto-complete="off"></el-input>
-                <el-form-item label="Notes">
-                    <el-input v-model="itemEditFormData.comment" type="textarea" autosize auto-complete="off"></el-input>
+                <el-form-item label="Notes"><br>
+                    <el-input v-model="itemEditFormData.comment" type="textarea" autosize auto-complete="off" @paste.native="handleNotesPaste"></el-input>
                 </el-form-item>
 
             </el-form>
@@ -194,10 +195,10 @@
                         <span class="foot_tags" class="default-font">
                             <span><i class="el-icon-price-tag"></i></span>
                             <span v-for="item in table.row.tags.split(',')" v-if="item.length !== 0"> <el-tag  size="mini" :mtag="item.trim()" class="main-tag-list"> <span v-html="item" @click="mainTagClick($event);"></span> </el-tag> <small>&#8239;</small> </span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="search_icons" src="icons/google-brands.svg" alt="Google"></img></span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="search_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="search_icons" src="icons/github-brands.svg" alt="Github"></span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="search_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="img_icons" src="icons/google-brands.svg" alt="Google"></img></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="img_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="img_icons" src="icons/github-brands.svg" alt="Github"></span>
+                            <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="img_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
                             <span><i class="el-icon-date"></i></span>
                             <span v-html="table.row.addTime" style="color: #93a1a1;font-size: small;"></span>
                             <span >&#x270F</span>

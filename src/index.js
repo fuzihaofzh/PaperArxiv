@@ -141,7 +141,6 @@ var ItemEdit = {
                 ctx.dbManager.searchItemInfo(searchValue, domains);
             }
             //toggle main tags
-            //setTimeout(this.toggleMainTags, 1);
         },
         sortTableItem: function(x, y){
             return x.addTime > y.addTime? 1 : -1;

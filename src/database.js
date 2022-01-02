@@ -116,9 +116,6 @@ function DBManager(ctx) {
                 needsearch = str.split(regSkip);
                 var res = '';
                 for(i in needsearch){
-                    if(needsearch[i] == undefined){
-                        a = 1
-                    }
                     res += needsearch[i].replace(regEx, '<span class="search-result-block">$1</span>');
                     if(nosearch && i < nosearch.length)res += nosearch[i];
                 }

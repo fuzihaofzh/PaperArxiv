@@ -26,7 +26,7 @@ PaperArxiv is a new paper management tool that helps to organize your mind. It f
 6. Double Click the item to add some notes;
 
 ## Notes Format
-The notes support Markdown, Latex, and Mermaid. For example, you can write the following notes to write items, formulas, and diagrams.
+The notes support Markdown, Latex, and Mermaid. For example, you can write the following notes to write items, formulas, and Mermaid diagrams.
 ```
     - Give a proof of the *repetition problem* for Generation;
     - New **encoding method**;
@@ -41,12 +41,20 @@ The notes support Markdown, Latex, and Mermaid. For example, you can write the f
     Theory-->Encoding;
     ```
 
+    ![My Image][image-1]
+
+
+
+  <!--The image data is attached as follows-->
+  [image-1]:data:image/png;base64,iVBORw0KGgoAAAANS...
+
 ```
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/1419566/147731761-3f55c24a-be5e-48c2-9159-ae58dddeedb9.png" width="800">
+  <img src="https://user-images.githubusercontent.com/1419566/147880349-5717d2e5-ad25-461b-8a80-ffab2a13b02b.png" width="800">
 </p>
+If you want to add images in the comments, just copy the image and paste in the edit box. Then it will insert a base64 image into the comments file.
 
 ## Download
 Please download our latest release! [Download](https://github.com/fuzihaofzh/PaperArxiv/releases)

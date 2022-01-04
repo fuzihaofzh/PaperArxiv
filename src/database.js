@@ -123,9 +123,9 @@ function DBManager(ctx) {
             }
             for (let key in candindateList) {
                 if(domains.some(function (x){return utils.strContain(candindateList[key][x].replace(regSkip, ""), searchText)})){
-                var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
-                newList.push(candindateList[key]);
-                newListRender.push(searchAndReplace(domains, newRow));
+                    var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
+                    newList.push(candindateList[key]);
+                    newListRender.push(searchAndReplace(domains, newRow));
                 }
             }
             return [newList, newListRender];

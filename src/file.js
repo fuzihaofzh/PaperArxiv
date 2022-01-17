@@ -17,8 +17,8 @@ function extractFromPdfFile(filePath, ctx) {
     var xpath = require('xpath'), dom = require('xmldom').DOMParser
     meta = []
     for(line of data.split('\n')){
-        if(['Abstract', 'abstract', 'ABSTRACT', 'BSTRACT', 'Introduction'].some(x => utils.strContain(line, x))) break;
         meta.push(line);
+        if(['Abstract', 'abstract', 'ABSTRACT', 'BSTRACT', 'Introduction'].some(x => utils.strContain(line, x))) break;
     }
     meta = meta.join('\n');
     var doc = new dom().parseFromString(meta)

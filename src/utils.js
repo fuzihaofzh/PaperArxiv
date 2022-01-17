@@ -137,7 +137,7 @@ function utils(){
         if(remove)newTag = "";
         if(oldTag == newTag)return;
         for (item of ctx.tableData){
-            tags = item.tags.split(/[,;\n]/g);
+            tags = item.tags.split(/ ?[,;\n] ?/g);
             oid = tags.indexOf(oldTag);
             while(oid != -1){
                 if(!remove){

@@ -13,7 +13,7 @@ function extractFromPdfFile(filePath, ctx) {
         return;
     }
     var years = utils.regFindAll(/19\d\d|20\d\d/g, data).map(x => Number(x)).filter(x => x <= new Date().getFullYear());
-    pdfInfo.year = Math.max(...(years.length == 0 ? [(new Date()).getFullYear()] : years));
+    pdfInfo.year = Math.max(...(years.length == 0 ? [(new Date()).getFullYear()] : years)).toString();
     var xpath = require('xpath'), dom = require('xmldom').DOMParser
     meta = []
     for(line of data.split('\n')){

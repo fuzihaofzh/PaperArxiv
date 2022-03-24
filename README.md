@@ -66,3 +66,9 @@ npm install
 ./node_modules/.bin/electron-rebuild
 npm run buildmac
 ```
+On Mac with M1 CPU, please use:
+```
+npm install
+./node_modules/.bin/electron-rebuild -a arm64
+npm run buildm1
+```

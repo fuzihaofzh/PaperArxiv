@@ -9,7 +9,8 @@
         "test": "ava",
         "buildlinux": "electron-packager .  PaperArxiv --platform=linux --arch=x64 --out dist/ --asar --overwrite",
         "buildwin": "electron-packager .  PaperArxiv --platform=win32 --arch=x64 --out dist/ --icon=icons/pa.ico --prune=true --asar --overwrite ",
-        "buildmac": "electron-packager .  PaperArxiv --platform=darwin --arch=x64 --out dist/ --icon=icons/pa.ico --asar --overwrite ",
+        "buildmac": "electron-packager .  PaperArxiv --platform=darwin --arch=universal --out dist/ --icon=icons/pa.ico --asar --overwrite ",
+        "buildm1": "electron-packager .  PaperArxiv --platform=darwin --arch=arm64 --out dist/ --icon=icons/pa.ico --asar --overwrite ",
         "deb64": "electron-installer-debian --src dist/PaperArxiv-linux-x64 --dest dist/installers/ --icon icons/pa.icns --arch amd64",
         "setupwin": "electron-installer-windows --src dist/PaperArxiv-win32-x64 --dest dist/installers/",
         "buildall": "electron-packager .  PaperArxiv --platform=all --arch=x64,ia32 --out dist/ --icon icons/pa --asar --overwrite"
@@ -40,7 +41,7 @@
     },
     "dependencies": {
         "@traptitech/markdown-it-katex": "^3.5.0",
-        "better-sqlite3": "^7.4.5",
+        "better-sqlite3": "^7.5.0",
         "child_process": "1.0.2",
         "element-ui": "2.15.6",
         "home-dir": "1.0.0",

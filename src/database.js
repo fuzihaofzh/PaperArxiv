@@ -8,6 +8,7 @@ function DBManager(ctx) {
             try{
                 db = BS3(path.join(ctx.configSettings.libpath, 'pa.db'));
             }catch(err){
+                console.log(err);
                 alert("Cannot open the database " + path.join(ctx.configSettings.libpath, 'pa.db'));
                 return;
             }

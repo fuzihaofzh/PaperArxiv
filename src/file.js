@@ -7,7 +7,7 @@ function extractFromPdfFile(filePath, ctx) {
     var child_process = require('child_process');
     var pdfInfo = {}
     try{
-        var data = child_process.execSync('pdftohtml -f 1 -l 1 -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString();
+        var data = child_process.execSync('pdftohtml -f 1 -l 1 -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin:' + ctx.configSettings.pdftohtmlPath}}).toString();
     }catch(err){
         ctx.error("Cannot find pdftohtml command in current shell. Please install popller and set the PATH for sh.\n" + err);
         return;
@@ -64,7 +64,7 @@ function extractFromPdfFile(filePath, ctx) {
     pdfInfo.addTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -5).replace('T', ' ');
     pdfInfo.updateTime = pdfInfo.addTime;
     try{
-        pdfInfo.content = child_process.execSync('pdftohtml -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin'}}).toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');
+        pdfInfo.content = child_process.execSync('pdftohtml -q -xml -i -stdout -fontfullname "' + filePath + '"', {env:{PATH: process.env.PATH + ':/usr/local/bin:' + ctx.configSettings.pdftohtmlPath}}).toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');
     }catch(err){
         pdfInfo.content = data.toString().replace(/<\/?[^>]+(>|$)/g, "").split('\n').filter(x => x.length > 10).join('\n');;
         ctx.error("Content extract error.\n" + err);

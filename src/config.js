@@ -50,7 +50,8 @@ function configManager(ctx){
             "engines":{
                 "gscholar": false
             },
-            "search": "https://www.google.com/search?q="
+            "search": "https://www.google.com/search?q=",
+            "pdftohtmlPath" : "/usr/local/bin"
         };
 
     }

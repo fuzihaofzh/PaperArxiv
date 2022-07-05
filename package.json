@@ -47,7 +47,7 @@
         "home-dir": "1.0.0",
         "katex": "0.15.1",
         "markdown-it": "^12.3.0",
-        "mermaid": "^8.13.8",
+        "mermaid": "^9.1.2",
         "opn": "5.4.0",
         "path": "0.12.7",
         "split.js": "1.6.4",

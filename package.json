@@ -29,7 +29,7 @@
     "devDependencies": {
         "ava": "3.15.0",
         "electron": "16.0.5",
-        "electron-builder": "^19.27.2",
+        "electron-builder": "^23.6.0",
         "electron-installer-windows": "^3.0.0",
         "electron-installer-debian": "3.1.0",
         "electron-packager": "15.4.0",

@@ -11,6 +11,7 @@ function utils(){
     };
     this.regFindAll = function (reg, str){
         var result = [];
+        let m;
         while (m = reg.exec(str)) {
             result.push(m[0])
         }
@@ -20,18 +21,24 @@ function utils(){
       return JSON.parse(JSON.stringify(src));
     };
     this.partialCopy = function(src, keys){
-        obj = {};
+        let obj = {};
         keys.forEach(x => obj[x] = src[x]);
         return obj;
     };
     this.partialCopyArray = function (src, keys){
-        dst = [];
+        if (!src || !Array.isArray(src)) {
+            return [];
+        }
+        let dst = [];
         for(var k in src){
             dst.push(this.partialCopy(src[k], keys));
         }
         return dst;
     };
     this.getUserTags = function (src){
+        if (!src || !Array.isArray(src)) {
+            return {};
+        }
         function byCount(lst){
             var itm, a= [], L= lst.length, o= {};
             for(var i= 0; i<L; i++){
@@ -44,8 +51,8 @@ function utils(){
             a = a.sort(function(a, b){
                 return o[b]-o[a];
             });
-            res = {};
-            for(aa of a){
+            let res = {};
+            for(let aa of a){
                 res[aa] = {};
                 res[aa].count = o[aa];
                 res[aa].isEdit = false;
@@ -54,24 +61,31 @@ function utils(){
             //a.forEach(x => res[x] = o[x]);
             return res
         }
-        tags = [];
+        let tags = [];
         for(var k of src){
-            tags = tags.concat(k['tags'].split(/[,;\n]/g));
+            if (k['tags']) {
+                tags = tags.concat(k['tags'].split(/[,;\n]/g));
+            }
         }
         tags = tags.map(x => x.trim());
         tags = byCount(tags);
         return tags;
     };
     this.getUserLibraryTree = function (src){
-        tree = [{name : "Library"}];
-        iconsList = Object.values(icons); //["🗄️", "📦", "📚", "🗂️", "📘"];
+        if (!src || !Array.isArray(src)) {
+            return [{name : "Library"}];
+        }
+        let tree = [{name : "Library"}];
+        let iconsList = Object.values(icons); //["🗄️", "📦", "📚", "🗂️", "📘"];
         function addNode(node, pathSeg, deepth, fullPath, name){
             // addNode(tree, ["Library", "aaa", "bbb"]);
             if (pathSeg.length == 0) return;
             var hasNode = false;
-            for (r of node){
-                if (pathSeg[0] == r.name){
+            let r = null;
+            for (let nodeItem of node){
+                if (pathSeg[0] == nodeItem.name){
                     hasNode = true;
+                    r = nodeItem;
                     break;
                 }
             }
@@ -93,14 +107,14 @@ function utils(){
             addNode(r.children, pathSeg.slice(1, pathSeg.length), deepth + 1, r.path, name);
         };
         for(var k of src){
-            paths = k['libraryPath'].split(/[\n]/g);
+            let paths = k['libraryPath'].split(/[\n]/g);
             if (paths.find(o => o === '/Library') == undefined){
                 k['libraryPath'] = '/Library\n' + k['libraryPath'];
                 paths = ['/Library'].concat(paths);
             }
             //epath = k['libraryPath'] + '\n/Library';
-            for(path of paths){
-                pathSeg = path.split('/');
+            for(let path of paths){
+                let pathSeg = path.split('/');
                 if(pathSeg[0] == "")pathSeg = pathSeg.slice(1, pathSeg.length);
                 addNode(tree, pathSeg, 0, "", k.name);
             }
@@ -111,17 +125,17 @@ function utils(){
         if(remove)newPath = "";
         if(newPath == oldPath)return;
         function findPath(paths, oldPath, strContain){
-            ids = [];
-            for(i in paths){
+            let ids = [];
+            for(let i in paths){
                 if(strContain(paths[i], oldPath)) ids.push(i);
             }
             return ids;
         }
-        for (item of ctx.tableData){
-            paths = item.libraryPath.split('\n');
-            oids = findPath(paths, oldPath, this.strContain);
+        for (let item of ctx.tableData){
+            let paths = item.libraryPath.split('\n');
+            let oids = findPath(paths, oldPath, this.strContain);
             if(oids.length > 0){
-                for(oid of oids){
+                for(let oid of oids){
                     if(!remove){
                         paths[oid] = paths[oid].replace(oldPath, newPath).trim();
                     }else{
@@ -136,9 +150,9 @@ function utils(){
     this.updateUserTags = function (ctx, oldTag, newTag,  remove = false){
         if(remove)newTag = "";
         if(oldTag == newTag)return;
-        for (item of ctx.tableData){
-            tags = item.tags.split(/ ?[,;\n] ?/g);
-            oid = tags.indexOf(oldTag);
+        for (let item of ctx.tableData){
+            let tags = item.tags.split(/ ?[,;\n] ?/g);
+            let oid = tags.indexOf(oldTag);
             while(oid != -1){
                 if(!remove){
                     tags[oid] = newTag;
@@ -155,6 +169,7 @@ function utils(){
         return JSON.stringify(config, null, '\t')
     }
     this.stringToConfig = function (text){
+        let sc;
         try{
             sc = JSON.parse(text);
         }catch(err){
@@ -167,25 +182,19 @@ function utils(){
         if(this.mumeEngine == undefined){
             this.mumeEngine = new mume.MarkdownEngine({
                 filePath: "",
-                config: {
-                  previewTheme: "github-light.css",
-                  // revealjsTheme: "white.css"
-                  codeBlockTheme: "default.css",
-                  printBackground: true,
-                  enableScriptExecution: true, // <= for running code chunks
-                },
-              });
+                projectDirectoryPath: "",
+            });
         }
-        if (!inputString)inputString = " "
-        html = this.mumeEngine.parseMD(inputString, {
-            useRelativeFilePath: true,
-            hideFrontMatter: true,
-            isForPreview: false,
-            runAllCodeChunks: false,
-          });
-        return html;
-    },
-    this.retrieveImageFromClipboardAsBase64 = function (pasteEvent, callback, imageFormat){
+        return {html: inputString}
+        //return this.mumeEngine.parseMD(inputString);
+    };
+  /**
+   * This handler retrieves the images from the clipboard as a base64 string and returns it in a callback.
+   * 
+   * @param pasteEvent 
+   * @param callback 
+   */
+  this.retrieveImageFromClipboardAsBase64 = function(pasteEvent, callback){
        if(pasteEvent.clipboardData == false){
            if(typeof(callback) == "function"){
                callback(undefined);
@@ -223,11 +232,9 @@ function utils(){
                ctx.drawImage(img, 0, 0);
    
                // Execute callback with the base64 URI of the image
-               if(typeof(callback) == "function"){
-                   callback(mycanvas.toDataURL(
-                       (imageFormat || "image/png")
-                   ));
-               }
+               callback(mycanvas.toDataURL(
+                   (items[i].type == "image/png") ? "image/png" : "image/jpeg"
+               ));
            };
    
            // Crossbrowser support for URL

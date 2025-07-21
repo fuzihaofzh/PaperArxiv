@@ -6,8 +6,25 @@ function configManager(ctx){
     this.writeConfig = function(){
         fs.writeFileSync(confPath, JSON.stringify(ctx.configSettings, null, '\t'));
     }
+    
+    // Default Ollama configuration
+    const defaultOllamaConfig = {
+        "enabled": true,
+        "model": "gemma3n:latest",
+        "host": "http://localhost:11434",
+        "temperature": 0.3,
+        "top_p": 0.9
+    };
+    
     if(fs.existsSync(confPath)){
         ctx.configSettings = JSON.parse(fs.readFileSync(confPath).toString());
+        
+        // Add ollama config if it doesn't exist in the loaded config
+        if (!ctx.configSettings.ollama) {
+            ctx.configSettings.ollama = defaultOllamaConfig;
+            // Write back the updated config
+            this.writeConfig();
+        }
     }else{
         ctx.configSettings = {
             "libpath": homeDir("papers"),
@@ -51,7 +68,8 @@ function configManager(ctx){
                 "gscholar": false
             },
             "search": "https://www.google.com/search?q=",
-            "pdftohtmlPath" : "/usr/local/bin"
+            "pdftohtmlPath" : "/usr/local/bin",
+            "ollama": defaultOllamaConfig
         };
 
     }

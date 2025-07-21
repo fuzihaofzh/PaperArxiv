@@ -6,16 +6,29 @@
     <meta charset="UTF-8">
     </meta>
     <title>PaperArxiv</title>
-    <link rel="stylesheet" href="node_modules/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="node_modules/element-plus/dist/index.css">
     <link rel="stylesheet" href="node_modules/katex/dist/katex.min.css">
     <script defer src="node_modules/katex/dist/katex.min.js"></script>
     <script defer src="node_modules/katex/dist/contrib/auto-render.min.js"></script>
-    <script src="node_modules/vue/dist/vue.js"></script>
-    <script src="node_modules/element-ui/lib/index.js"></script>
+    <script src="node_modules/vue/dist/vue.global.js"></script>
+    <script src="node_modules/element-plus/dist/index.full.js"></script>
     <script src="node_modules/mermaid/dist/mermaid.min.js"></script>
 </head>
 
 <style>
+    /* Disable Element Plus tag animations */
+    .el-tag {
+        transition: none !important;
+        animation: none !important;
+    }
+    .el-tag * {
+        transition: none !important;
+        animation: none !important;
+    }
+    .el-zoom-in-center-enter-active,
+    .el-zoom-in-center-leave-active {
+        transition: none !important;
+    }
     .default-font{
         font-family: Helvetica;
     }
@@ -27,8 +40,50 @@
     td {background-color: #fdf6e3 ;font-size:120%}
     td:hover {background-color: #f9f2df !important;}
     .el-dialog__body, .el-dialog__header, .el-dialog__footer,.el-textarea__inner, .el-button--default, .el-input__inner, .el-message-box {background-color: #fdf6e3 !important}
-    #el-input-search {background-color: #fdf6e3 !important;}
-    #el-input-search:focus {background-color: #fdf6e3;}
+    /* 对话框内的输入框样式 */
+    .el-dialog .el-input__wrapper {
+        background-color: #fdf6e3 !important;
+    }
+    .el-dialog .el-textarea__inner {
+        background-color: #fdf6e3 !important;
+    }
+    .el-dialog .el-input__inner {
+        background-color: #fdf6e3 !important;
+    }
+    /* 搜索框样式修复 - Element Plus 3.x 兼容 */
+    .el-input__wrapper {
+        background-color: #fdf6e3 !important;
+        background-image: none !important;
+        box-shadow: 0 0 0 1px #DCDFE6 inset !important;
+    }
+    .el-input__inner {
+        background-color: #fdf6e3 !important;
+        background-image: none !important;
+    }
+    /* 修复输入框内部可能的白色元素 */
+    .el-input__wrapper > * {
+        background-color: transparent !important;
+    }
+    .el-input__prefix, .el-input__suffix {
+        background: none !important;
+    }
+    .el-input-group__append {
+        background-color: #fdf6e3 !important;
+        border-left: 1px solid #DCDFE6;
+    }
+    /* 强制移除所有可能的白色背景 */
+    [class*="el-input"] {
+        --el-input-bg-color: #fdf6e3 !important;
+        --el-fill-color-blank: #fdf6e3 !important;
+    }
+    /* Element Plus 全局颜色变量覆盖 */
+    :root {
+        --el-bg-color: #fdf6e3 !important;
+        --el-fill-color: #fdf6e3 !important;
+        --el-fill-color-blank: #fdf6e3 !important;
+        --el-fill-color-light: #fdf6e3 !important;
+        --el-input-bg-color: #fdf6e3 !important;
+    }
     #el-main-table {background-color: #fdf6e3;}
     .my-el-button{background-color:#fdf6e3 !important; margin-top: 1px;}
     .my-el-button:hover{background-color:#EAE0C0 !important;border-color: #DDDFE5 !important;color: #606266 !important; }
@@ -47,10 +102,26 @@
     .el-tree-node__content:hover {background-color: #EAE0C0 !important;
     }
     
-    .main-tag-list, .tag-list{ background: #fdf6e3;border: 0px;color: #586e75;}
+    .main-tag-list, .tag-list{ background: #fdf6e3;border: 0px;color: #586e75; padding: 0 4px !important;}
     .main-tag-list:hover{cursor: default; background-color: #EAE0C0}
     .tag-list:hover{cursor: pointer; background-color: #EAE0C0}
     .tag-list-toggle, .tag-list-toggle:hover, .main-tag-list-toggle, .main-tag-list-toggle:hover{ background: #DECB88;}
+    /* Override Element Plus tag styles */
+    .el-tag {
+        padding: 0 4px !important;
+        height: 20px !important;
+        line-height: 18px !important;
+        margin: 2px 2px !important;
+    }
+    .el-tag--mini {
+        height: 18px !important;
+        padding: 0 3px !important;
+        line-height: 16px !important;
+        margin: 1px 1px !important;
+    }
+    .main-tag-list {
+        margin-right: 3px !important;
+    }
 
     .split {
         display: flex;
@@ -73,6 +144,7 @@
         opacity: .6;
         cursor:pointer;
         width: 1em;
+        margin-right: 1px;
     }
     span.default-font img{max-width: 90%;display: inline; margin: 0px; padding: 0px;}
     .grabbable {
@@ -86,32 +158,94 @@
         cursor: -moz-grabbing;
         cursor: -webkit-grabbing;
     }
+    .copy-button {
+        margin-left: 8px;
+        cursor: pointer;
+        opacity: 0.4;
+        font-size: 20px;
+        vertical-align: middle;
+        color: #586e75;
+        font-weight: normal;
+        transition: opacity 0.2s;
+        display: inline-block;
+    }
+    .copy-button:hover {
+        opacity: 0.8;
+    }
+    /* Loading spinner styles */
+    .pdf-loading .el-loading-spinner {
+        color: #409EFF !important;
+    }
+    .pdf-loading .el-loading-text {
+        color: #409EFF !important;
+        font-size: 16px !important;
+        margin-top: 10px !important;
+    }
+    .el-loading-spinner .circular {
+        animation: loading-rotate 2s linear infinite;
+    }
+    @keyframes loading-rotate {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    /* Author and affiliation styles */
+    .author-tag {
+        color: #859900;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .author-tag:hover {
+        color: #6c7f00;
+        background-color: rgba(133, 153, 0, 0.1);
+    }
+    .affiliation-tag {
+        color: #93a1a1;
+        cursor: pointer;
+        font-style: italic;
+        text-decoration: none;
+    }
+    .affiliation-tag:hover {
+        color: #586e75;
+        background-color: rgba(147, 161, 161, 0.1);
+    }
+    /* Prevent white flash on data update */
+    .el-table__body-wrapper {
+        min-height: 200px;
+        transition: opacity 0.1s ease-in-out;
+    }
+    .el-table__empty-block {
+        transition: opacity 0.1s ease-in-out;
+    }
 </style>
 
 <body style="overflow-y:hidden" bgcolor="#fdf6e3">
     <div id="app">
         <div style="float:right; width:128px; margin-bottom: 8px;">
-            <el-button icon="el-icon-plus" @click="openPdfFile" class="my-el-button" plain><!--Add--></el-button>
-            <el-button icon="el-icon-setting" @click="itemConfigFormVisible = true" class="my-el-button" plain><!--Config--></el-button>
+            <el-button :icon="Plus" @click="openPdfFile" class="my-el-button" plain></el-button>
+            <el-button :icon="Setting" @click="itemConfigFormVisible = true" class="my-el-button" plain></el-button>
         </div>
         <div style="margin-right: 138px;margin-bottom: 8px;">
-            <el-input id="el-input-search" placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus v-on:input="searchContent" style="width:100%; margin-top: 1px;" ref="searchBox">
-                <el-button slot="append" icon="el-icon-search" @click="searchContent" class="my-el-button"></el-button>
-                <el-button id="el-input-clear-search" slot="append" style="display:none" @click="searchContent('')"></el-button>
+            <el-input id="el-input-search" placeholder="Please input query (support regular expressions）" v-model="userInputSearchText" autofocus @input="onSearchInput" style="width:100%; margin-top: 1px;" ref="searchBox">
+                <template #append>
+                    <el-button :icon="Search" @click="searchContent"></el-button>
+                </template>
             </el-input>
         </div>
 
 
 
-        <el-dialog title="Config" :visible.sync="itemConfigFormVisible" :show-close=false width="80%">
+        <el-dialog title="Config" v-model="itemConfigFormVisible" :show-close=false width="80%">
             <el-input v-model="itemConfigFormData" type="textarea" autosize auto-complete="off"></el-input>
-            <div slot="footer" class="dialog-footer">
+            <template #footer>
+                <div class="dialog-footer">
                 <el-button @click="itemConfigFormVisible = false">Cancel</el-button>
                 <el-button type="primary" @click="itemConfigFormDataUpdate" autofocus>OK</el-button>
-            </div>
+                </div>
+            </template>
         </el-dialog>
 
-        <el-dialog title="Edit Item" :visible.sync="itemEditFormVisible" :show-close=false width="80%">
+        <el-dialog title="Edit Item" v-model="itemEditFormVisible" :show-close=false width="80%">
             <el-form :model="itemEditFormData">
                 <el-form-item label="Name">
                     <el-input v-model="itemEditFormData.name" type="textarea" autosize auto-complete="off" :disabled="true"></el-input>
@@ -129,20 +263,30 @@
                     <el-input v-model="itemEditFormData.year" type="textarea" autosize auto-complete="off" @input="changNameByNewInfo"></el-input>
                 </el-form-item>
                 <el-form-item label="tags">
-                    <el-autocomplete v-model="itemEditFormData.tags" :fetch-suggestions="queryUserTagSuggestion" @select="queryUserTagSelect" type="textarea" autosize auto-complete="off" style="width:100% !important"></el-input>
+                    <el-autocomplete v-model="itemEditFormData.tags" :fetch-suggestions="queryUserTagSuggestion" @select="queryUserTagSelect" type="textarea" autosize auto-complete="off" style="width:100% !important"></el-autocomplete>
                 </el-form-item>
                 <el-form-item label="Library Path">
-                    <el-input v-model="itemEditFormData.libraryPath" type="textarea" autosize auto-complete="off"></el-input>
-                <el-form-item label="Notes"><br>
-                    <el-input v-model="itemEditFormData.comment" type="textarea" autosize auto-complete="off" @paste.native="handleNotesPaste"></el-input>
+                    <el-autocomplete 
+                        v-model="itemEditFormData.libraryPath" 
+                        :fetch-suggestions="queryLibraryPathSuggestion" 
+                        @select="queryLibraryPathSelect" 
+                        placeholder="Enter library path"
+                        style="width:100% !important"
+                        :trigger-on-focus="true">
+                    </el-autocomplete>
+                </el-form-item>
+                <el-form-item label="Notes">
+                    <el-input v-model="itemEditFormData.comment" type="textarea" :rows="5" auto-complete="off" @paste="handleNotesPaste"></el-input>
                 </el-form-item>
 
             </el-form>
-            <div slot="footer" class="dialog-footer">
+            <template #footer>
+                <div class="dialog-footer">
                 <el-button type="danger" @click="deleteRowInfo()">Delete</el-button>
                 <el-button @click="itemEditFormVisible = false;itemEditFormDataCancel();">Cancel</el-button>
                 <el-button type="primary" @click="itemEditFormDataUpdate" autofocus>OK</el-button>
-            </div>
+                </div>
+            </template>
         </el-dialog>
 
         <div class="split" style="height: 100%; width: 100%; border-style: solid;border-width: 2px; border-color: #eee8d5; border-bottom: none;">
@@ -150,61 +294,63 @@
                 <div id="split-00">
                     <el-scrollbar style="height: 100%;">
                         <el-tree :data="treePath" :highlight-current="true" :expand-on-click-node="false" default-expand-all  @node-click="handleLibraryNodeClick" node-key="node.path" ref="library-tree" draggable @node-drop="handleLibraryTreeNodeDrop">
-                            <span class="custom-tree-node" slot-scope="{ node, data }">
+                            <template #default="{ node, data }">
+                            <span class="custom-tree-node">
                                 <span class="tree-label" v-show="data.isEdit">
-                                    <i class="el-icon-delete" @mousedown="handleTreeFinishEdit(data, true)"></i>
-                                    <el-input size="mini" autofocus
+                                    <el-icon @mousedown="handleTreeFinishEdit(data, true)"><Delete /></el-icon>
+                                    <el-input size="small" autofocus
                                     v-model="data.name"
                                     @blur="handleTreeFinishEdit(data)"
-                                    @keyup.enter.native="handleTreeFinishEdit(data)"></el-input>
+                                    @keyup.enter="handleTreeFinishEdit(data)"></el-input>
                                 </span>
                                 <span @drop="handleLibraryNodeDrop($event)" @dragover.prevent :path="data.path" class="custom-tree-node" @dblclick='handleLibraryNodeDBClick($event, data)' v-html='node.label'>
                                 </span>
                             </span>
+                            </template>
                         </el-tree>
                         </el-scrollbar>
                 </div>
                 <div id="split-01">
                     <el-scrollbar style="height: 100%;">
                         <div v-for="(value,key,index) in userTags" style="display:inline">
-                            <el-tag size="mini" class="tag-list" :etag="key"> 
+                            <el-tag size="small" class="tag-list" :etag="key"> 
                                 <span class="tag-label" v-show="value.isEdit">
-                                    <i class="el-icon-delete" @mousedown="handleTagsFinishEdit(key, value, true)"></i>
-                                    <el-input size="mini" autofocus
+                                    <el-icon @mousedown="handleTagsFinishEdit(key, value, true)"><Delete /></el-icon>
+                                    <el-input size="small" autofocus
                                     v-model="value.label"
                                     @blur="handleTagsFinishEdit(key, value)"
-                                    @keyup.enter.native="handleTagsFinishEdit(key, value)"></el-input>
+                                    @keyup.enter="handleTagsFinishEdit(key, value)"></el-input>
                                 </span>
-                                <span v-html="key + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag><small>&#8239;</small>
+                                <span v-html="(value.displayTag || key) + '(' + value.count.toString() + ')'" @click="leftTagClick($event);" @dblclick='handleLibraryNodeDBClick($event, value)' v-show="!value.isEdit"></span> </el-tag>
                         </div>
                         </el-scrollbar>
                 </div>
             </div>
             <div id="split-1">
-                <el-table id="el-main-table" :data="tableData"  height="100%" style=" width: 100%;" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick">
+                <el-table id="el-main-table" :data="tableData"  height="100%" style=" width: 100%;" :default-sort="{prop: 'paper', order: 'descending'}" @cell-dblclick="onCellDBClick" :row-height="100" v-loading="isLoading">
                     <el-table-column prop="paper" label="Paper" sortable :sort-method="sortTableItem">
-                        <template slot-scope="table">
-                        <lazy-component wrapper-tag="section" root-margin="2000px 2000px 2000px 2000px">
-                        <span draggable="true" :name="table.row.name" @dragstart="handleItemIconDrag($event)" class = "grabbable">&#x1F4C4</span>&nbsp<span v-html="table.row.title" class="default-font" style="color: #073642; font-weight: bold; font-size: large;"></span>
+                        <template #default="{ row }">
+                        <span draggable="true" :name="row.name" @dragstart="handleItemIconDrag($event)" class = "grabbable">&#x1F4C4</span>&nbsp<span v-html="row.title" class="default-font" style="color: #073642; font-weight: bold; font-size: large;"></span>
+                        <span @click="copyTitle(row.title)" class="copy-button" title="Copy title">⎘</span>
                         <span>&nbsp &nbsp</span>
-                        <span v-html="table.row.name" @click="openPdfFileWithSystemTool(table.row.name)" style="color:#268bd2; cursor:pointer;" class="default-font"></span>
+                        <span v-html="row.name" @click="openPdfFileWithSystemTool(row.name)" style="color:#268bd2; cursor:pointer;" class="default-font"></span>
                         <br>
-                        <span v-html="table.row.authors.replace(/\n/g, ', ')" style="white-space: pre-line;color:#859900" class="default-font"></span>
+                        <span class="default-font authors-container" v-html="renderAllAuthors(row.authors)" @click="handleAuthorClick($event)"></span>
                         <br> 
-                        <span v-html="renderComments(table.row.comment)" class="default-font"></span>
+                        <span v-html="renderComments(row.comment)" class="default-font" v-if="row.comment"></span>
                         <span class="foot_tags" class="default-font">
-                            <span><i class="el-icon-price-tag"></i></span>
-                            <span v-for="item in table.row.tags.split(',')" v-if="item.length !== 0"> <el-tag  size="mini" :mtag="item.trim()" class="main-tag-list"> <span v-html="item" @click="mainTagClick($event);"></span> </el-tag> <small>&#8239;</small> </span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'search')"><img  class="img_icons" src="icons/google-brands.svg" alt="Google"></img></span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'googlescholar')"><img  class="img_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'github')"><img  class="img_icons" src="icons/github-brands.svg" alt="Github"></span>
-                            <span @click="searchTitleInBrowser(table.row.title, 'dblp')"><img  class="img_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>
-                            <span><i class="el-icon-date"></i></span>
-                            <span v-html="table.row.addTime" style="color: #93a1a1;font-size: small;"></span>
+                            <template v-for="item in (row.tags || '').split(',')">
+                                <span v-if="item.length !== 0" :key="item"><el-tag size="small" :mtag="item.trim()" class="main-tag-list"><span v-html="item" @click="mainTagClick($event);"></span></el-tag></span>
+                            </template>
+                            <span @click="searchTitleInBrowser(row.title, 'search')"><img  class="img_icons" src="icons/google-brands.svg" alt="Google"></img></span>&nbsp;
+                            <span @click="searchTitleInBrowser(row.title, 'googlescholar')"><img  class="img_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>&nbsp;
+                            <span @click="searchTitleInBrowser(row.title, 'github')"><img  class="img_icons" src="icons/github-brands.svg" alt="Github"></span>&nbsp;
+                            <span @click="searchTitleInBrowser(row.title, 'dblp')"><img  class="img_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>&nbsp;
+                            <el-icon><Calendar /></el-icon>
+                            <span v-html="row.addTime" style="color: #93a1a1;font-size: small;"></span>
                             <span >&#x270F</span>
-                            <span v-html="table.row.updateTime" style="color: #93a1a1;font-size: small;"></span>
+                            <span v-html="row.updateTime" style="color: #93a1a1;font-size: small;"></span>
                         </span>
-                        </lazy-component>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -216,8 +362,6 @@
 
 
 </body>
-<script>
-    require('./renderer.js');
-</script>
+<script src="./renderer.js"></script>
 
 </html>

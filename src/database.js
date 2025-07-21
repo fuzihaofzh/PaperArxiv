@@ -35,15 +35,23 @@ function DBManager(ctx) {
         return counts;
     }
     this.loadFullData = dbwrapper(function() {
-        if(typeof(this.db) !== undefined)ctx.tableData = this.db.prepare("SELECT * FROM docInfoTable").all();
+        try {
+            if(typeof(this.db) !== undefined){
+                ctx.tableData = this.db.prepare("SELECT * FROM docInfoTable").all();
+            }
+        } catch(err) {
+            console.log("Database error:", err);
+            ctx.tableData = [];
+        }
         //ctx.tagCounts = _exteactTags(ctx.tableData, "tags");
         //ctx.journalCounts = _exteactTags(ctx.tableData, "journal");
     });
     _insertItem = dbwrapper(function(itemInfo, srcPath, dstPath){
-        keys = Object.keys(itemInfo);
-        values = "('" + keys.map(x => itemInfo[x].toString().replace(/\'/g, "''")).join("', '") + "')";
-        keys = "(" + keys.join(', ') + ")";
-        this.db.prepare("insert into " + ctx.dbTableName + keys + " values  " + values + ";").run();
+        const keys = Object.keys(itemInfo);
+        const placeholders = keys.map(() => '?').join(', ');
+        const values = keys.map(key => itemInfo[key]);
+        const sql = `INSERT INTO ${ctx.dbTableName} (${keys.join(', ')}) VALUES (${placeholders})`;
+        this.db.prepare(sql).run(...values);
         if(srcPath != dstPath){
           fs.writeFileSync(dstPath, fs.readFileSync(srcPath));
           fs.unlink(srcPath, function (err) {
@@ -52,12 +60,14 @@ function DBManager(ctx) {
         }
     });
     _deleteItem = dbwrapper(function (name){
-        this.db.prepare("delete from " + ctx.dbTableName + " where name='" + name + "';").run();
+        const sql = `DELETE FROM ${ctx.dbTableName} WHERE name = ?`;
+        this.db.prepare(sql).run(name);
     });
     this.InsertItemInfo = dbwrapper(function() {
         ctx.itemEditFormDataStandard = utils.deepcopy(ctx.ctor.itemEditFormData);
         var itemInfo = ctx.itemEditFormDataStandard;
-        if (this.db.prepare("select name from " + ctx.dbTableName + " where name = '" + itemInfo.name + "';").all().length != 0) {
+        const checkSql = `SELECT name FROM ${ctx.dbTableName} WHERE name = ?`;
+        if (this.db.prepare(checkSql).all(itemInfo.name).length != 0) {
             ctx.error("有同名文件" + itemInfo.name + "存在！请编辑名称。");
             ctx.ctor.itemEditFormVisible = true;
             return -1;
@@ -98,48 +108,170 @@ function DBManager(ctx) {
     this.searchItemInfo = function(searchText, domains = ctx.searchKeys){
         function searchOneKeyword(candindateList, searchText){
             if (!searchText) return candindateList;
-            newList = [];
-            newListRender = [];
-            var regEx = new RegExp('(' + searchText + ')', "ig");
-            var regSkip = new RegExp(/```mermaid[^```]+```|\$\$[^$]+\$\$|\n.+data:image\/png;base64.+|\!\[[^\]]+\]\[[^\]]+\]/g);
-            function searchAndReplace(attrList, newRow){
-                for (let key in domains){
-                    if (domains[key] == "comment"){
-                        newRow[attrList[key]] = replaceOutOfBlocks(newRow[attrList[key]].toString());
-                    }else{
-                        newRow[attrList[key]] = newRow[attrList[key]].toString().replace(regEx, '<span class="search-result-block">$1</span>');
+            
+            // Check for exact match prefix
+            const isExactMatch = searchText.startsWith('EXACT_MATCH:');
+            if (isExactMatch) {
+                searchText = searchText.substring('EXACT_MATCH:'.length);
+            }
+            
+            // Escape special regex characters
+            const escapedSearchText = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            // For better performance, use indexOf for simple searches
+            const searchLower = searchText.toLowerCase();
+            const useRegex = searchText.includes('*') || searchText.includes('.') || searchText.includes('[') || searchText.includes('(') || searchText.includes(')');
+            const regEx = useRegex ? new RegExp('(' + escapedSearchText + ')', "ig") : null;
+            const regSkip = /```mermaid[^```]+```|\$\$[^$]+\$\$|\n.+data:image\/png;base64.+|\!\[[^\]]+\]\[[^\]]+\]/g;
+            
+            const newList = [];
+            
+            for(let i = 0; i < candindateList.length; i++){
+                const item = candindateList[i];
+                let found = false;
+                const highlightedItem = {};
+                
+                // Copy all properties first
+                for(let key in item) {
+                    highlightedItem[key] = item[key];
+                }
+                
+                for(let j = 0; j < domains.length; j++){
+                    const domain = domains[j];
+                    const fieldValue = item[domain];
+                    
+                    if (!fieldValue) continue;
+                    
+                    
+                    // Special handling for libraryPath - check if fieldValue contains the search path
+                    if (domain === 'libraryPath') {
+                        // For library path, check if the item's path contains the searched path
+                        // Since items might have multiple paths separated by newlines
+                        const pathLines = fieldValue.split('\n');
+                        let pathFound = false;
+                        for (let pathLine of pathLines) {
+                            if (pathLine.trim().includes(searchText)) {
+                                pathFound = true;
+                                break;
+                            }
+                        }
+                        if (pathFound) {
+                            // Highlight the matching path
+                            const fieldLower = fieldValue.toLowerCase();
+                            const searchLower = searchText.toLowerCase();
+                            const index = fieldLower.indexOf(searchLower);
+                            if (index !== -1) {
+                                const before = fieldValue.substring(0, index);
+                                const match = fieldValue.substring(index, index + searchText.length);
+                                const after = fieldValue.substring(index + searchText.length);
+                                highlightedItem[domain] = before + '<font class="search-result-block">' + match + '</font>' + after;
+                            } else {
+                                highlightedItem[domain] = fieldValue;
+                            }
+                            found = true;
+                        }
+                        continue;
+                    }
+                    
+                    // Skip highlighting for tags domain to avoid issues with display
+                    if (domain === 'tags') {
+                        // Just check if it matches without replacing
+                        if (useRegex) {
+                            if (fieldValue.match(regEx)) {
+                                found = true;
+                            }
+                        } else {
+                            if (fieldValue.toLowerCase().includes(searchLower)) {
+                                found = true;
+                            }
+                        }
+                    } else if (domain === 'authors' && isExactMatch) {
+                        // For exact match, use regex to ensure the complete name appears as a whole unit
+                        const escapedName = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        // Look for the name surrounded by word boundaries or non-word characters
+                        const exactPattern = new RegExp('(?:^|\\W)' + escapedName + '(?:\\W|$)', 'i');
+                        if (exactPattern.test(fieldValue)) {
+                            found = true;
+                            // Highlight the match
+                            const highlightPattern = new RegExp('(' + escapedName + ')', 'gi');
+                            highlightedItem[domain] = fieldValue.replace(highlightPattern, '<font class="search-result-block">$1</font>');
+                        }
+                    } else {
+                        if (useRegex) {
+                            const cleanedValue = fieldValue.replace(regSkip, '');
+                            if (cleanedValue.match(regEx)) {
+                                highlightedItem[domain] = fieldValue.replace(regSkip, '').replace(regEx, '<font class="search-result-block">$1</font>');
+                                found = true;
+                            }
+                        } else {
+                            // Use indexOf for simple searches - much faster
+                            const fieldLower = fieldValue.toLowerCase();
+                            const index = fieldLower.indexOf(searchLower);
+                            if (index !== -1) {
+                                const before = fieldValue.substring(0, index);
+                                const match = fieldValue.substring(index, index + searchText.length);
+                                const after = fieldValue.substring(index + searchText.length);
+                                highlightedItem[domain] = before + '<font class="search-result-block">' + match + '</font>' + after;
+                                found = true;
+                            }
+                        }
                     }
                 }
-                return newRow;
-            }
-            function replaceOutOfBlocks(str){
-                nosearch = str.match(regSkip);
-                needsearch = str.split(regSkip);
-                var res = '';
-                for(i in needsearch){
-                    res += needsearch[i].replace(regEx, '<span class="search-result-block">$1</span>');
-                    if(nosearch && i < nosearch.length)res += nosearch[i];
-                }
-                return res;
-            }
-            for (let key in candindateList) {
-                if(domains.some(function (x){return utils.strContain(candindateList[key][x].replace(regSkip, ""), searchText)})){
-                    var newRow = utils.partialCopy(candindateList[key], ctx.showKeys);
-                    newList.push(candindateList[key]);
-                    newListRender.push(searchAndReplace(domains, newRow));
+                
+                if(found){
+                    newList.push(highlightedItem);
                 }
             }
-            return [newList, newListRender];
+            return newList;
         }
-        var candindateList = ctx.tableData;
-        if (ctx.previousSearchText !== undefined && searchText.includes(ctx.previousSearchText)){
-            candindateList = ctx.previousCandindateList;
+        
+        function searchMultipleKeywords(candindateList, searchText){
+            const searchedKeywords = searchText.substring(1, searchText.length-1).split('|');
+            const resultMap = new Map();
+            
+            for (let keyword of searchedKeywords){
+                const results = searchOneKeyword(candindateList, keyword);
+                for (let item of results) {
+                    if (!resultMap.has(item.name)) {
+                        resultMap.set(item.name, item);
+                    }
+                }
+            }
+            
+            return Array.from(resultMap.values());
         }
-        ctx.previousSearchText = searchText;
-        searchText = searchText.trim().split(/[ ]*\+[ ]*/g);
-        for (let word of searchText){
-            [ctx.previousCandindateList, candindateList] = searchOneKeyword(candindateList, word);
+        
+        if (typeof searchText !== 'string') searchText = searchText.toString();
+        
+        // Don't copy all data if not necessary
+        let candindateList;
+        if (domains === ctx.searchKeys && searchText.length > 0) {
+            // Use original data for better performance
+            candindateList = ctx.tableData.map(item => {
+                const copy = {};
+                for (let key of ctx.showKeys) {
+                    copy[key] = item[key];
+                }
+                return copy;
+            });
+        } else {
+            candindateList = utils.partialCopyArray(ctx.tableData, ctx.showKeys);
         }
+        
+        if (searchText[0] === '(' && searchText[searchText.length-1] === ')'){
+            candindateList = searchMultipleKeywords(candindateList, searchText);
+        } else {
+            // For libraryPath searches, don't split on spaces - use the full path
+            if (domains.length === 1 && domains[0] === 'libraryPath') {
+                candindateList = searchOneKeyword(candindateList, searchText);
+            } else {
+                // For other searches, split on spaces for AND logic
+                const searchKeywords = searchText.split(' ').filter(k => k.length > 0);
+                for(let i = 0; i < searchKeywords.length; ++i){
+                    candindateList = searchOneKeyword(candindateList, searchKeywords[i]);
+                }
+            }
+        }
+        
         ctx.ctor.tableData = candindateList;
     }
 }

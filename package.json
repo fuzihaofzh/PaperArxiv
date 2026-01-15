@@ -11,7 +11,7 @@
         "build": "electron-builder",
         "build:mac": "electron-builder --mac",
         "build:mac-arm64": "electron-builder --mac --arm64",
-        "build:mac-x64": "electron-builder --mac --x64", 
+        "build:mac-x64": "electron-builder --mac --x64",
         "build:mac-universal": "electron-builder --mac --universal",
         "build:win": "electron-builder --win",
         "build:linux": "electron-builder --linux",
@@ -114,11 +114,15 @@
             "target": [
                 {
                     "target": "nsis",
-                    "arch": ["x64"]
+                    "arch": [
+                        "x64"
+                    ]
                 },
                 {
                     "target": "portable",
-                    "arch": ["x64"]
+                    "arch": [
+                        "x64"
+                    ]
                 }
             ]
         },
@@ -127,15 +131,21 @@
             "target": [
                 {
                     "target": "AppImage",
-                    "arch": ["x64"]
+                    "arch": [
+                        "x64"
+                    ]
                 },
                 {
                     "target": "deb",
-                    "arch": ["x64"]
+                    "arch": [
+                        "x64"
+                    ]
                 },
                 {
                     "target": "rpm",
-                    "arch": ["x64"]
+                    "arch": [
+                        "x64"
+                    ]
                 }
             ]
         },

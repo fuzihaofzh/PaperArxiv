@@ -24,7 +24,7 @@ ctx.searchKeys = ['name', 'title', 'year', 'authors', 'tags', 'comment', 'addTim
 var emptyData = {}
 ctx.showKeys.forEach(x => emptyData[x] = "");
 // Import icons
-const { Plus, Setting, Search, Delete, PriceTag, Promotion, Calendar, CopyDocument } = require('@element-plus/icons-vue');
+const { Plus, Setting, Search, Delete, PriceTag, Promotion, Calendar, CopyDocument, FolderOpened } = require('@element-plus/icons-vue');
 
 var ItemEdit = {
     data() {
@@ -56,7 +56,8 @@ var ItemEdit = {
             PriceTag,
             Promotion,
             Calendar,
-            CopyDocument
+            CopyDocument,
+            FolderOpened
         }
     },
     watch: {
@@ -138,6 +139,10 @@ var ItemEdit = {
         },
         openPdfFileWithSystemTool: function(val){
             shell.openPath(path.join(this.ctx.configSettings.libpath, val.replace(/<\/?[^>]+(>|$)/g, "")));
+        },
+        showInFinder: function(name){
+            const cleanName = name.replace(/<\/?[^>]+(>|$)/g, "");
+            shell.showItemInFolder(path.join(this.ctx.configSettings.libpath, cleanName));
         },
         copyTitle: function(title){
             // Remove HTML tags from title

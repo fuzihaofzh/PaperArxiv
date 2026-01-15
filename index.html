@@ -346,6 +346,7 @@
                             <span @click="searchTitleInBrowser(row.title, 'googlescholar')"><img  class="img_icons" src="icons/google-scholar.svg" alt="google-scholar"></span>&nbsp;
                             <span @click="searchTitleInBrowser(row.title, 'github')"><img  class="img_icons" src="icons/github-brands.svg" alt="Github"></span>&nbsp;
                             <span @click="searchTitleInBrowser(row.title, 'dblp')"><img  class="img_icons" src="icons/icon_dblp_bw.svg" alt="dblp"></span>&nbsp;
+                            <span @click="showInFinder(row.name)"><img class="img_icons" src="icons/448-finder.svg" alt="Finder"></span>&nbsp;
                             <el-icon><Calendar /></el-icon>
                             <span v-html="row.addTime" style="color: #93a1a1;font-size: small;"></span>
                             <span >&#x270F</span>

@@ -18,7 +18,7 @@ function DBManager(ctx) {
             //db.prepare("create table if not exists " + ctx.metaTableName + " (name text NOT NULL PRIMARY KEY, info text)");
             this.db = db;
 
-            func(...args);
+            func.call(this, ...args);
 
             this.db.close();
         };
@@ -66,6 +66,10 @@ function DBManager(ctx) {
     this.InsertItemInfo = dbwrapper(function() {
         ctx.itemEditFormDataStandard = utils.deepcopy(ctx.ctor.itemEditFormData);
         var itemInfo = ctx.itemEditFormDataStandard;
+        // Convert tags array to string if needed
+        if (Array.isArray(itemInfo.tags)) {
+            itemInfo.tags = itemInfo.tags.join(', ');
+        }
         const checkSql = `SELECT name FROM ${ctx.dbTableName} WHERE name = ?`;
         if (this.db.prepare(checkSql).all(itemInfo.name).length != 0) {
             ctx.error("有同名文件" + itemInfo.name + "存在！请编辑名称。");
